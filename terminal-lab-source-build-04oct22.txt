@@ -1,0 +1,433 @@
+[student@workstation ~]$ ls -l
+total 84
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student    35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student  4096 Oct  4 18:27 DO288-apps
+-rw-rw-r--.  1 student student  4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student     6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student   193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student 71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Videos
+[student@workstation ~]$ lab source-build start
+
+Checking prerequisites for Lab: Deploying and Managing Applications on an OpenShift Cluster
+
+ Checking local clone of the applications repository:
+ · Folder '/home/student/DO288-apps' is a git repo.............  SUCCESS
+ · Git repo '/home/student/DO288-apps' has no pending changes..  SUCCESS
+ Verify the OpenShift cluster is running:
+ · Router pods are available...................................  SUCCESS
+ · OAuth pods are available....................................  SUCCESS
+ · API pods are available......................................  SUCCESS
+ · No cluster operators are progressing........................  SUCCESS
+ · Control plane node 'master01' is ready......................  SUCCESS
+ Checking required artifacts:
+ · Project 'nodejs-helloworld' exists in student's GitHub fork.  SUCCESS
+ · Module 'nodejs' exists in classroom's Nexus.................  SUCCESS
+ Checking for conflicts with existing OpenShift projects:
+ · Project 'developer-source-build' is absent..................  SUCCESS
+
+Setting up the classroom for Lab: Deploying and Managing Applications on an OpenShift Cluster
+
+ · Download exercise files.....................................  SUCCESS
+ · Download solution files.....................................  SUCCESS
+
+Overall start status...........................................  SUCCESS
+
+[student@workstation ~]$ source /usr/local/etc/ocp4.config
+[student@workstation ~]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+Login successful.
+
+You don't have any projects. You can try to create a new project, by running
+
+    oc new-project <projectname>
+
+[student@workstation ~]$ oc new-project ${RHT_OCP4_DEV_USER}-source-build
+Now using project "developer-source-build" on server "https://api.ocp4.example.com:6443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app rails-postgresql-example
+
+to build a new example application in Ruby. Or use kubectl to deploy a simple Kubernetes application:
+
+    kubectl create deployment hello-node --image=k8s.gcr.io/e2e-test-images/agnhost:2.33 -- /agnhost serve-hostname
+
+[student@workstation ~]$ cd DO288-apps
+[student@workstation DO288-apps]$ git checkout main
+Already on 'main'
+Your branch is up to date with 'origin/main'.
+[student@workstation DO288-apps]$ git checkout -b source-build
+Switched to a new branch 'source-build'
+[student@workstation DO288-apps]$ git push -u origin source-build
+Username for 'https://github.com': leonardotorresochoa
+Password for 'https://leonardotorresochoa@github.com': 
+Total 0 (delta 0), reused 0 (delta 0), pack-reused 0
+remote: 
+remote: Create a pull request for 'source-build' on GitHub by visiting:
+remote:      https://github.com/leonardotorresadiera/DO288-apps/pull/new/source-build
+remote: 
+To https://github.com/leonardotorresadiera/DO288-apps.git
+ * [new branch]      source-build -> source-build
+Branch 'source-build' set up to track remote branch 'source-build' from 'origin'.
+[student@workstation DO288-apps]$ oc new-app --name greet --build-env npm_config_registry=http://${RHT_OCP4_NEXUS_SERVER}/repository/nodejs nodejs:16-ubi8~https://github.com/${RHT_OCP4_GITHUB_USER}/DO288-apps#source-build --context-dir nodejs-helloworld
+warning: Cannot check if git requires authentication.
+--> Found image 2575b6e (2 months old) in image stream "openshift/nodejs" under tag "16-ubi8" for "nodejs:16-ubi8"
+
+    Node.js 16 
+    ---------- 
+    Node.js 16 available as container is a base platform for building and running various Node.js 16 applications and frameworks. Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient, perfect for data-intensive real-time applications that run across distributed devices.
+
+    Tags: builder, nodejs, nodejs16
+
+    * A source build using source code from https://github.com/leonardotorresadiera/DO288-apps#source-build will be created
+      * The resulting image will be pushed to image stream tag "greet:latest"
+      * Use 'oc start-build' to trigger a new build
+
+--> Creating resources ...
+    imagestream.image.openshift.io "greet" created
+    buildconfig.build.openshift.io "greet" created
+    deployment.apps "greet" created
+    service "greet" created
+--> Success
+    Build scheduled, use 'oc logs -f buildconfig/greet' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/greet' 
+    Run 'oc status' to view your app.
+[student@workstation DO288-apps]$ oc logs -d bc/greet
+error: unknown shorthand flag: 'd' in -d
+See 'oc logs --help' for usage.
+[student@workstation DO288-apps]$ oc logs -f bc/greet
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	5dcc01b9a4babb847a91608666e5277a3cdef92a (Use Thorntail 2.4.0)
+	Author:	Alex Corcoles <alexcorcoles@redhat.com>
+	Date:	Mon Sep 12 13:31:28 2022 +0200
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-04T23:08:47Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1004 23:08:47.438327       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44...
+Getting image source signatures
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying blob sha256:9e7b36274d543f81ea98d46e10740d693cd7f021f2b4975e320245d18869dd7d
+Copying config sha256:2575b6e83cfd2cb36a913eb17dec1d66bbdb629f4001c32d191213d102b5e575
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+STEP 2/9: LABEL "io.openshift.build.commit.id"="5dcc01b9a4babb847a91608666e5277a3cdef92a"       "io.openshift.build.commit.ref"="source-build"       "io.openshift.build.commit.message"="Use Thorntail 2.4.0"       "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="nodejs-helloworld"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44"       "io.openshift.build.commit.author"="Alex Corcoles <alexcorcoles@redhat.com>"       "io.openshift.build.commit.date"="Mon Sep 12 13:31:28 2022 +0200"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="greet-1"     OPENSHIFT_BUILD_NAMESPACE="developer-source-build"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_REFERENCE="source-build"     OPENSHIFT_BUILD_COMMIT="5dcc01b9a4babb847a91608666e5277a3cdef92a"     npm_config_registry="http://nexus-common.apps.na410.prod.nextcle.com/repository/nodejs"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source ...
+---> Installing all dependencies
+npm ERR! code EJSONPARSE
+npm ERR! path /opt/app-root/src/package.json
+npm ERR! JSON.parse Unexpected string in JSON at position 241 while parsing '{
+npm ERR! JSON.parse   "name": "nodejs-helloworld",
+npm ERR! JSON.parse   "vers'
+npm ERR! JSON.parse Failed to parse JSON data.
+npm ERR! JSON.parse Note: package.json must be actual JSON, not just JavaScript.
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /opt/app-root/src/.npm/_logs/2022-10-04T23_09_02_121Z-debug-0.log
+error: build error: error building at STEP "RUN /usr/libexec/s2i/assemble": error while running runtime: exit status 1
+[student@workstation DO288-apps]$ ls -l
+total 16
+drwxrwxr-x. 2 student student    57 Oct  3 19:15 app-config
+drwxrwxr-x. 9 student student   196 Oct  3 19:15 books
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 build-app
+drwxrwxr-x. 3 student student    38 Oct  3 19:15 container-build
+drwxrwxr-x. 2 student student    20 Oct  3 19:15 go-hello
+drwxrwxr-x. 3 student student    60 Oct  3 19:15 hello-java
+drwxrwxr-x. 2 student student    63 Oct  3 19:15 hello-world-nginx
+drwxrwxr-x. 2 student student    24 Oct  3 19:15 html-helloworld
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 java-serverhost
+-rw-rw-r--. 1 student student 11343 Oct  3 19:15 LICENSE
+drwxrwxr-x. 3 student student    71 Oct  3 19:15 micro-java
+drwxrwxr-x. 3 student student    71 Oct  3 19:15 movies
+drwxrwxr-x. 2 student student    62 Oct  3 19:15 nexus3
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 nodejs-helloworld
+drwxrwxr-x. 2 student student    41 Oct  3 19:15 php-hello-dockerfile
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 php-helloworld
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 php-scale
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 post-commit
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 probes
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 quip
+drwxrwxr-x. 2 student student    38 Oct  3 19:15 quotes
+-rw-rw-r--. 1 student student   205 Oct  3 19:15 README.md
+drwxrwxr-x. 3 student student    36 Oct  3 19:15 s2i-scripts
+drwxrwxr-x. 2 student student    25 Oct  3 19:15 simple-pipeline
+drwxrwxr-x. 3 student student    88 Oct  3 19:15 todo-api
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 todo-api-micro
+drwxrwxr-x. 3 student student   164 Oct  3 19:15 todo-backend
+drwxrwxr-x. 4 student student   195 Oct  3 19:15 todo-frontend
+drwxrwxr-x. 5 student student    85 Oct  3 19:15 todo-single
+drwxrwxr-x. 3 student student   115 Oct  3 19:15 todo-ssr
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 trigger-builds
+drwxrwxr-x. 2 student student    24 Oct  4 18:27 ubi-echo
+drwxrwxr-x. 2 student student    39 Oct  3 19:15 ubi-info
+drwxrwxr-x. 2 student student    24 Oct  3 19:15 ubi-sleep
+[student@workstation DO288-apps]$ phython3 -m json.tool nodejs-helloworld/package.json 
+bash: phython3: command not found...
+[student@workstation DO288-apps]$ python3 -m json.tool nodejs-helloworld/package.json 
+Expecting ':' delimiter: line 12 column 15 (char 241)
+[student@workstation DO288-apps]$ vi ~/DO288-apps/nodejs-helloworld/package.json
+[student@workstation DO288-apps]$ cat ~/DO288-apps/nodejs-helloworld/package.json
+{
+  "name": "nodejs-helloworld",
+  "version": "1.0.0",
+  "description": "Hello World!",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Red Hat Training",
+  "license": "ASL",
+  "dependencies": {
+    "express":"4.14.x"
+  }
+}
+[student@workstation DO288-apps]$ cd nodejs-helloworld
+[student@workstation nodejs-helloworld]$ git status
+On branch source-build
+Your branch is up to date with 'origin/source-build'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   package.json
+
+no changes added to commit (use "git add" and/or "git commit -a")
+[student@workstation nodejs-helloworld]$ git add .
+[student@workstation nodejs-helloworld]$ git commit -m "fix json"
+[source-build f29eb7e] fix json
+ Committer: Student User <student@workstation.lab.example.com>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+[student@workstation nodejs-helloworld]$ git push
+Username for 'https://github.com': leonardotorresochoa
+Password for 'https://leonardotorresochoa@github.com': 
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 394 bytes | 394.00 KiB/s, done.
+Total 4 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+To https://github.com/leonardotorresadiera/DO288-apps.git
+   5dcc01b..f29eb7e  source-build -> source-build
+[student@workstation nodejs-helloworld]$ oc start-build --follow bc/greet
+build.build.openshift.io/greet-2 started
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	f29eb7e13c7d59ef2f737e3305677e8fbf63be6b (fix json)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Tue Oct 4 19:12:04 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-04T23:12:50Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1004 23:12:50.569347       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44...
+Getting image source signatures
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying blob sha256:9e7b36274d543f81ea98d46e10740d693cd7f021f2b4975e320245d18869dd7d
+Copying config sha256:2575b6e83cfd2cb36a913eb17dec1d66bbdb629f4001c32d191213d102b5e575
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+STEP 2/9: LABEL "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Tue Oct 4 19:12:04 2022 -0400"       "io.openshift.build.commit.id"="f29eb7e13c7d59ef2f737e3305677e8fbf63be6b"       "io.openshift.build.commit.ref"="source-build"       "io.openshift.build.commit.message"="fix json"       "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="nodejs-helloworld"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="greet-2"     OPENSHIFT_BUILD_NAMESPACE="developer-source-build"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_REFERENCE="source-build"     OPENSHIFT_BUILD_COMMIT="f29eb7e13c7d59ef2f737e3305677e8fbf63be6b"     npm_config_registry="http://nexus-common.apps.na410.prod.nextcle.com/repository/nodejs"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source ...
+---> Installing all dependencies
+
+added 43 packages in 2s
+---> Building in production mode
+---> Pruning the development dependencies
+
+up to date in 394ms
+/tmp is not a mountpoint
+---> Cleaning the /tmp/npm-*
+/opt/app-root/src/.npm is not a mountpoint
+---> Cleaning the npm cache /opt/app-root/src/.npm
+STEP 9/9: CMD /usr/libexec/s2i/run
+COMMIT temp.builder.openshift.io/developer-source-build/greet-2:3bfe7264
+time="2022-10-04T23:13:09Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:5966005eac8d0b52bf676cd20f1ffb3435fe4d8245a3afadcd27b0b9e07c096b
+Copying blob sha256:9936c6aaa811c2084fe2c1034e24cbecc3d3ac8db8fe987395723b19c678655b
+Copying blob sha256:0ce645f59bfcd24ff75234e6567b6945cb9fd16fe18082485924d6db10d53326
+Copying blob sha256:4bcf486c55ce7cf7c23ff25b8795fac98c0f640f6d3f705bedd919b41a157cff
+Copying blob sha256:34a5f6114d5ad9b958fd3259b0045c467ba8b06b425e51e20e484f26a69fe752
+Copying config sha256:8a4fe1d307052b3283dec56d7721488413a4797cfbcb8bbf3a8a9d676198cdb3
+Writing manifest to image destination
+Storing signatures
+--> 8a4fe1d3070
+Successfully tagged temp.builder.openshift.io/developer-source-build/greet-2:3bfe7264
+8a4fe1d307052b3283dec56d7721488413a4797cfbcb8bbf3a8a9d676198cdb3
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-source-build/greet:latest ...
+Getting image source signatures
+Copying blob sha256:34a5f6114d5ad9b958fd3259b0045c467ba8b06b425e51e20e484f26a69fe752
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying blob sha256:9e7b36274d543f81ea98d46e10740d693cd7f021f2b4975e320245d18869dd7d
+Copying config sha256:8a4fe1d307052b3283dec56d7721488413a4797cfbcb8bbf3a8a9d676198cdb3
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-source-build/greet@sha256:234df24827e197efa364ed0afadd1f66370a87868ae79e3b43e0d171e9a70ee7
+Push successful
+[student@workstation nodejs-helloworld]$ oc status
+In project developer-source-build on server https://api.ocp4.example.com:6443
+
+svc/greet - 172.30.90.160:8080
+  deployment/greet deploys istag/greet:latest <-
+    bc/greet source builds https://github.com/leonardotorresadiera/DO288-apps#source-build on openshift/nodejs:16-ubi8 
+    deployment #2 running for 7 seconds - 0/1 pods
+    deployment #1 deployed 4 minutes ago - 0/1 pods growing to 1
+
+
+1 info identified, use 'oc status --suggest' to see details.
+[student@workstation nodejs-helloworld]$ oc get pod
+NAME                     READY   STATUS      RESTARTS   AGE
+greet-1-build            0/1     Error       0          4m43s
+greet-2-build            0/1     Completed   0          44s
+greet-669644dc59-jdqws   1/1     Running     0          12s
+[student@workstation nodejs-helloworld]$ oc logs greet-669644dc59-jdqws
+Environment: 
+	DEV_MODE=false
+	NODE_ENV=production
+	DEBUG_PORT=5858
+Launching via npm...
+npm info using npm@8.3.1
+npm info using node@v16.14.0
+npm timing npm:load:whichnode Completed in 0ms
+npm timing config:load:defaults Completed in 5ms
+npm timing config:load:file:/usr/lib/node_modules/npm/npmrc Completed in 1ms
+npm timing config:load:builtin Completed in 1ms
+npm timing config:load:cli Completed in 3ms
+npm timing config:load:env Completed in 0ms
+npm timing config:load:project Completed in 1ms
+npm timing config:load:file:/opt/app-root/src/.npmrc Completed in 3ms
+npm timing config:load:user Completed in 3ms
+npm timing config:load:file:/opt/app-root/src/.npm-global/etc/npmrc Completed in 2ms
+npm timing config:load:global Completed in 3ms
+npm timing config:load:validate Completed in 2ms
+npm timing config:load:credentials Completed in 2ms
+npm timing config:load:setEnvs Completed in 1ms
+npm timing config:load Completed in 22ms
+npm timing npm:load:configload Completed in 22ms
+npm timing npm:load:setTitle Completed in 1ms
+npm timing config:load:flatten Completed in 3ms
+npm timing npm:load:display Completed in 6ms
+npm timing npm:load:logFile Completed in 5ms
+npm timing npm:load:timers Completed in 0ms
+npm timing npm:load:configScope Completed in 1ms
+npm timing npm:load Completed in 36ms
+
+> nodejs-helloworld@1.0.0 start
+> node app.js
+
+Example app listening on port 8080!
+[student@workstation nodejs-helloworld]$ oc get route
+No resources found in developer-source-build namespace.
+[student@workstation nodejs-helloworld]$ oc expose svc/greet
+route.route.openshift.io/greet exposed
+[student@workstation nodejs-helloworld]$ oc get route
+NAME    HOST/PORT                                            PATH   SERVICES   PORT       TERMINATION   WILDCARD
+greet   greet-developer-source-build.apps.ocp4.example.com          greet      8080-tcp                 None
+[student@workstation nodejs-helloworld]$ 
+[student@workstation nodejs-helloworld]$ curl http://greet-${RHT_OCP4_DEV_USER}-source-build.${RHT_OCP4_WILDCARD_DOMAIN}
+Hello World!
+[student@workstation nodejs-helloworld]$ 
+[student@workstation nodejs-helloworld]$ cd ..
+[student@workstation DO288-apps]$ cd ..
+[student@workstation ~]$ ls -l
+total 84
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student    35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student  4096 Oct  4 18:27 DO288-apps
+-rw-rw-r--.  1 student student  4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student     6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student   193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student 71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Videos
+[student@workstation ~]$ cat /usr/local/etc/ocp4.config^C
+[student@workstation ~]$ zip -r DO288-lab-solutions-source-build.zip DO288
+  adding: DO288/ (stored 0%)
+  adding: DO288/labs/ (stored 0%)
+  adding: DO288/labs/source-build/ (stored 0%)
+  adding: DO288/labs/source-build/oc-new-app.sh (deflated 23%)
+  adding: DO288/solutions/ (stored 0%)
+  adding: DO288/solutions/source-build/ (stored 0%)
+  adding: DO288/solutions/source-build/package.json (deflated 36%)
+[student@workstation ~]$ lab source-build grade
+
+Grading the student's work for Lab: Deploying and Managing Applications on an OpenShift Cluster
+
+ · Log in on OpenShift.........................................  SUCCESS
+ · Enter project 'developer-source-build'......................  PASS
+ · Build config points to the HTTPS git repo...................  PASS
+ · Latest 'greet' build is successful..........................  PASS
+ · Pod 'greet' is ready and runnning...........................  PASS
+ · Pod 'greet' logs shows application is started...............  PASS
+ · Route 'greet' exists........................................  PASS
+ · Application 'greet' returns the 'Hello World' message.......  PASS
+
+Overall exercise grade.........................................  PASS
+
+[student@workstation ~]$ lab source-build finish
+
+Completing Lab: Deploying and Managing Applications on an OpenShift Cluster
+
+ · Log in on OpenShift.........................................  SUCCESS
+ · Remove exercise files.......................................  SUCCESS
+ · Remove solution files.......................................  SUCCESS
+ · Delete OpenShift project 'developer-source-build'...........  SUCCESS
+ · Wait for project 'developer-source-build' to be gone........  SUCCESS
+ · Git repo '/home/student/DO288-apps' has no pending changes..  SUCCESS
+
+Please use start if you wish to do the exercise again.
+
+[student@workstation ~]$ 
+

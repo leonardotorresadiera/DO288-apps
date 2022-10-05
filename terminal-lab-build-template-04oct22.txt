@@ -1,0 +1,1597 @@
+[student@workstation ~]$ clear
+
+[student@workstation ~]$ ls -l
+total 4
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student   35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student 4096 Oct  3 20:53 DO288-apps
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student    6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student  193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Templates
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Videos
+[student@workstation ~]$ 
+[student@workstation ~]$ cd DO288-apps/
+[student@workstation DO288-apps]$ git checkout main
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+[student@workstation DO288-apps]$ git pull
+Already up to date.
+[student@workstation DO288-apps]$ cd ..
+[student@workstation ~]$ ls -l
+total 4
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student   35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student 4096 Oct  4 18:27 DO288-apps
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student    6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student  193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Templates
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Videos
+[student@workstation ~]$ cd DO288
+[student@workstation DO288]$ ls -l
+total 0
+drwxr-xr-x. 2 student student 6 Oct  3 20:52 labs
+drwxr-xr-x. 2 student student 6 Oct  3 20:52 solutions
+[student@workstation DO288]$ cd ..
+[student@workstation ~]$ ls -l
+total 4
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student   35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student 4096 Oct  4 18:27 DO288-apps
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student    6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student  193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Templates
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Videos
+[student@workstation ~]$ zip
+Copyright (c) 1990-2008 Info-ZIP - Type 'zip "-L"' for software license.
+Zip 3.0 (July 5th 2008). Usage:
+zip [-options] [-b path] [-t mmddyyyy] [-n suffixes] [zipfile list] [-xi list]
+  The default action is to add or replace zipfile entries from list, which
+  can include the special name - to compress standard input.
+  If zipfile and list are omitted, zip compresses stdin to stdout.
+  -f   freshen: only changed files  -u   update: only changed or new files
+  -d   delete entries in zipfile    -m   move into zipfile (delete OS files)
+  -r   recurse into directories     -j   junk (don't record) directory names
+  -0   store only                   -l   convert LF to CR LF (-ll CR LF to LF)
+  -1   compress faster              -9   compress better
+  -q   quiet operation              -v   verbose operation/print version info
+  -c   add one-line comments        -z   add zipfile comment
+  -@   read names from stdin        -o   make zipfile as old as latest entry
+  -x   exclude the following names  -i   include only the following names
+  -F   fix zipfile (-FF try harder) -D   do not add directory entries
+  -A   adjust self-extracting exe   -J   junk zipfile prefix (unzipsfx)
+  -T   test zipfile integrity       -X   eXclude eXtra file attributes
+  -y   store symbolic links as the link instead of the referenced file
+  -e   encrypt                      -n   don't compress these suffixes
+  -h2  show more help
+  
+[student@workstation ~]$ zip -r DO288-labsolutions.zip DO288
+  adding: DO288/ (stored 0%)
+  adding: DO288/labs/ (stored 0%)
+  adding: DO288/solutions/ (stored 0%)
+[student@workstation ~]$ ls -l
+total 8
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student   35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student 4096 Oct  4 18:27 DO288-apps
+-rw-rw-r--.  1 student student  472 Oct  4 18:39 DO288-labsolutions.zip
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student    6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student  193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Templates
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Videos
+[student@workstation ~]$ cd DO288
+[student@workstation DO288]$ ls -l
+total 0
+drwxr-xr-x. 2 student student 6 Oct  3 20:52 labs
+drwxr-xr-x. 2 student student 6 Oct  3 20:52 solutions
+[student@workstation DO288]$ ls -l labs/
+total 0
+[student@workstation DO288]$ ls -l solutions/
+total 0
+[student@workstation DO288]$ cd ..
+[student@workstation ~]$ ls -l
+total 8
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student   35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student 4096 Oct  4 18:27 DO288-apps
+-rw-rw-r--.  1 student student  472 Oct  4 18:39 DO288-labsolutions.zip
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student    6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student  193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Templates
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Videos
+[student@workstation ~]$ rm -fr DO288-labsolutions.zip 
+[student@workstation ~]$ ls -l
+total 4
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student   35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student 4096 Oct  4 18:27 DO288-apps
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student    6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student  193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Templates
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Videos
+[student@workstation ~]$ lab build-template start
+
+Checking prerequisites for GE: Managing an Application with the CLI
+
+ Checking local clone of the applications repository:
+ · Folder '/home/student/DO288-apps' is a git repo.............  SUCCESS
+ · Git repo '/home/student/DO288-apps' has no pending changes..  SUCCESS
+ Verify the OpenShift cluster is running:
+ · Router pods are available...................................  SUCCESS
+ · OAuth pods are available....................................  SUCCESS
+ · API pods are available......................................  SUCCESS
+ · No cluster operators are progressing........................  SUCCESS
+ · Control plane node 'master01' is ready......................  SUCCESS
+ Checking required artifacts:
+ · Project 'quotes' exists in student's GitHub fork............  SUCCESS
+ Checking for conflicts with existing OpenShift projects:
+ · Project 'developer-build-template' is absent................  SUCCESS
+
+Setting up the classroom for GE: Managing an Application with the CLI
+
+ · Download exercise files.....................................  SUCCESS
+
+Overall start status...........................................  SUCCESS
+
+[student@workstation ~]$ ls ~/DO288-apps/quotes
+get.php  index.php
+[student@workstation ~]$ cat ~/DO288/labs/build-template/php-mysql-ephemeral.json
+{
+    "kind": "Template",
+    "apiVersion": "template.openshift.io/v1",
+    "metadata": {
+        "name": "php-mysql-ephemeral",
+        "annotations": {
+            "description": "A  PHP application with a MySQL database.\nWARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.",
+            "iconClass": "icon-php",
+            "openshift.io/display-name": "PHP + MySQL (Ephemeral)",
+            "tags": "php",
+            "template.openshift.io/long-description": "This template defines resources needed to develop a PHP application, including a build configuration, application deployment configuration, and database deployment configuration.  The database is stored in non-persistent storage, so this configuration should be used for experimental purposes only.",
+            "template.openshift.io/provider-display-name": "Red Hat Training"
+        }
+    },
+    "message": "The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.\n",
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "stringData": {
+                "database-password": "${DATABASE_PASSWORD}",
+                "database-user": "${DATABASE_USER}"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "description": "Exposes and load balances the application pods",
+                    "service.alpha.openshift.io/dependencies": "[{\"name\": \"${DATABASE_SERVICE_NAME}\", \"kind\": \"Service\"}]"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "web",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "app": "${NAME}"
+                }
+            }
+        },
+        {
+            "apiVersion": "route.openshift.io/v1",
+            "kind": "Route",
+            "metadata": {
+                "annotations": {
+                    "template.openshift.io/expose-uri": "http://{.spec.host}{.spec.path}"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "spec": {
+                "host": "${APPLICATION_DOMAIN}",
+                "to": {
+                    "kind": "Service",
+                    "name": "${NAME}"
+                }
+            }
+        },
+        {
+            "apiVersion": "image.openshift.io/v1",
+            "kind": "ImageStream",
+            "metadata": {
+                "annotations": {
+                    "description": "Keeps track of changes in the application image"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+	    "spec": {
+                "lookupPolicy": {
+                    "local": true
+                }
+	    }
+        },
+        {
+            "apiVersion": "build.openshift.io/v1",
+            "kind": "BuildConfig",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to build the application"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "spec": {
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "${NAME}:latest"
+                    }
+                },
+                "source": {
+                    "contextDir": "${CONTEXT_DIR}",
+                    "git": {
+                        "ref": "${SOURCE_REPOSITORY_REF}",
+                        "uri": "${SOURCE_REPOSITORY_URL}"
+                    },
+                    "type": "Git"
+                },
+                "strategy": {
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "name": "php:7.4-ubi8",
+                            "namespace": "${NAMESPACE}"
+                        }
+                    },
+                    "type": "Source"
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        },
+                        "type": "GitHub"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to deploy the PHP application"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "matchLabels": {
+                        "app": "${NAME}"
+                    }
+                },
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "app": "${NAME}"
+                        },
+                        "name": "${NAME}"
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "DATABASE_SERVICE_NAME",
+                                        "value": "${DATABASE_SERVICE_NAME}"
+                                    },
+                                    {
+                                        "name": "DATABASE_NAME",
+                                        "value": "${DATABASE_NAME}"
+                                    },
+                                    {
+                                        "name": "DATABASE_USER",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-user",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "DATABASE_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "${NAME}:latest",
+                                "name": "php-app",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "description": "Exposes the database server"
+                },
+                "name": "${DATABASE_SERVICE_NAME}",
+                "labels": {
+                    "app": "${DATABASE_SERVICE_NAME}"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "mysql",
+                        "port": 3306,
+                        "targetPort": 3306
+                    }
+                ],
+                "selector": {
+                    "app": "${DATABASE_SERVICE_NAME}"
+                }
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to deploy the database"
+                },
+                "name": "${DATABASE_SERVICE_NAME}",
+                "labels": {
+                    "app": "${DATABASE_SERVICE_NAME}"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "matchLabels": {
+                        "app": "${DATABASE_SERVICE_NAME}"
+                    }
+                },
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "${DATABASE_SERVICE_NAME}",
+                        "labels": {
+                            "app": "${DATABASE_SERVICE_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "MYSQL_USER",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-user",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_ROOT_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_DATABASE",
+                                        "value": "${DATABASE_NAME}"
+                                    }
+                                ],
+                                "image": "image-registry.openshift-image-registry.svc:5000/openshift/mysql:8.0-el8",
+                                "livenessProbe": {
+                                    "initialDelaySeconds": 30,
+                                    "tcpSocket": {
+                                        "port": 3306
+                                    },
+                                    "timeoutSeconds": 1
+                                },
+                                "name": "mysql",
+                                "ports": [
+                                    {
+                                        "containerPort": 3306
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-i",
+                                            "-c",
+                                            "MYSQL_PWD='${DATABASE_PASSWORD}' mysql -h 127.0.0.1 -u ${DATABASE_USER} -D ${DATABASE_NAME} -e 'SELECT 1'"
+                                        ]
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1
+                                },
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/var/lib/mysql",
+                                        "name": "data"
+                                    }
+                                ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "emptyDir": {},
+                                "name": "data"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "name": "NAME",
+            "displayName": "Name",
+            "description": "The name assigned to all of the app objects defined in this template.",
+            "value": "php-app",
+            "required": true
+        },
+        {
+            "name": "NAMESPACE",
+            "displayName": "Namespace",
+            "description": "The OpenShift Namespace where the S2I biulder ImageStream resides.",
+            "value": "openshift",
+            "required": true
+        },
+        {
+            "name": "SOURCE_REPOSITORY_URL",
+            "displayName": "Git Repository URL",
+            "description": "The URL of the repository with your application source code.",
+            "required": true
+        },
+        {
+            "name": "SOURCE_REPOSITORY_REF",
+            "displayName": "Git Reference",
+            "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch."
+        },
+        {
+            "name": "CONTEXT_DIR",
+            "displayName": "Context Directory",
+            "description": "Set this to the relative path to your project if it is not in the root of your repository."
+        },
+        {
+            "name": "APPLICATION_DOMAIN",
+            "displayName": "Application Hostname",
+            "description": "The exposed hostname that will route to the PHP app service, if left blank a value will be defaulted."
+        },
+        {
+            "name": "GITHUB_WEBHOOK_SECRET",
+            "displayName": "GitHub Webhook Secret",
+            "description": "Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{40}"
+        },
+        {
+            "name": "DATABASE_SERVICE_NAME",
+            "displayName": "Database Service Name",
+            "value": "mysql",
+            "required": true
+        },
+        {
+            "name": "DATABASE_NAME",
+            "displayName": "Database Name",
+            "value": "phpapp",
+            "required": true
+        },
+        {
+            "name": "DATABASE_USER",
+            "displayName": "Database User",
+            "value": "php",
+            "required": true
+        },
+        {
+            "name": "DATABASE_PASSWORD",
+            "displayName": "Database Password",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{16}"
+        }
+    ],
+    "labels": {
+        "template": "php-mysql-ephemeral"
+    }
+}
+[student@workstation ~]$ ls -l DO288/labs/
+total 0
+drwxrwxr-x. 2 student student 76 Sep 15 13:10 build-template
+[student@workstation ~]$ ls -l DO288/labs/build-template/
+total 24
+-rwxrwxr-x. 1 student student   444 Sep 15 13:10 create-app.sh
+-rw-rw-r--. 1 student student 16245 Sep 15 13:10 php-mysql-ephemeral.json
+-rw-rw-r--. 1 student student   392 Sep 15 13:10 quote.sql
+[student@workstation ~]$ cat ~/DO288/labs/build-template/php-mysql-ephemeral.json
+{
+    "kind": "Template",
+    "apiVersion": "template.openshift.io/v1",
+    "metadata": {
+        "name": "php-mysql-ephemeral",
+        "annotations": {
+            "description": "A  PHP application with a MySQL database.\nWARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.",
+            "iconClass": "icon-php",
+            "openshift.io/display-name": "PHP + MySQL (Ephemeral)",
+            "tags": "php",
+            "template.openshift.io/long-description": "This template defines resources needed to develop a PHP application, including a build configuration, application deployment configuration, and database deployment configuration.  The database is stored in non-persistent storage, so this configuration should be used for experimental purposes only.",
+            "template.openshift.io/provider-display-name": "Red Hat Training"
+        }
+    },
+    "message": "The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.\n",
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "stringData": {
+                "database-password": "${DATABASE_PASSWORD}",
+                "database-user": "${DATABASE_USER}"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "description": "Exposes and load balances the application pods",
+                    "service.alpha.openshift.io/dependencies": "[{\"name\": \"${DATABASE_SERVICE_NAME}\", \"kind\": \"Service\"}]"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "web",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "app": "${NAME}"
+                }
+            }
+        },
+        {
+            "apiVersion": "route.openshift.io/v1",
+            "kind": "Route",
+            "metadata": {
+                "annotations": {
+                    "template.openshift.io/expose-uri": "http://{.spec.host}{.spec.path}"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "spec": {
+                "host": "${APPLICATION_DOMAIN}",
+                "to": {
+                    "kind": "Service",
+                    "name": "${NAME}"
+                }
+            }
+        },
+        {
+            "apiVersion": "image.openshift.io/v1",
+            "kind": "ImageStream",
+            "metadata": {
+                "annotations": {
+                    "description": "Keeps track of changes in the application image"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+	    "spec": {
+                "lookupPolicy": {
+                    "local": true
+                }
+	    }
+        },
+        {
+            "apiVersion": "build.openshift.io/v1",
+            "kind": "BuildConfig",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to build the application"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "spec": {
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "${NAME}:latest"
+                    }
+                },
+                "source": {
+                    "contextDir": "${CONTEXT_DIR}",
+                    "git": {
+                        "ref": "${SOURCE_REPOSITORY_REF}",
+                        "uri": "${SOURCE_REPOSITORY_URL}"
+                    },
+                    "type": "Git"
+                },
+                "strategy": {
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "name": "php:7.4-ubi8",
+                            "namespace": "${NAMESPACE}"
+                        }
+                    },
+                    "type": "Source"
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        },
+                        "type": "GitHub"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to deploy the PHP application"
+                },
+                "name": "${NAME}",
+                "labels": {
+                    "app": "${NAME}"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "matchLabels": {
+                        "app": "${NAME}"
+                    }
+                },
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "app": "${NAME}"
+                        },
+                        "name": "${NAME}"
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "DATABASE_SERVICE_NAME",
+                                        "value": "${DATABASE_SERVICE_NAME}"
+                                    },
+                                    {
+                                        "name": "DATABASE_NAME",
+                                        "value": "${DATABASE_NAME}"
+                                    },
+                                    {
+                                        "name": "DATABASE_USER",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-user",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "DATABASE_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "${NAME}:latest",
+                                "name": "php-app",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Service",
+            "metadata": {
+                "annotations": {
+                    "description": "Exposes the database server"
+                },
+                "name": "${DATABASE_SERVICE_NAME}",
+                "labels": {
+                    "app": "${DATABASE_SERVICE_NAME}"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "mysql",
+                        "port": 3306,
+                        "targetPort": 3306
+                    }
+                ],
+                "selector": {
+                    "app": "${DATABASE_SERVICE_NAME}"
+                }
+            }
+        },
+        {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+                "annotations": {
+                    "description": "Defines how to deploy the database"
+                },
+                "name": "${DATABASE_SERVICE_NAME}",
+                "labels": {
+                    "app": "${DATABASE_SERVICE_NAME}"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "matchLabels": {
+                        "app": "${DATABASE_SERVICE_NAME}"
+                    }
+                },
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "${DATABASE_SERVICE_NAME}",
+                        "labels": {
+                            "app": "${DATABASE_SERVICE_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "env": [
+                                    {
+                                        "name": "MYSQL_USER",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-user",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_ROOT_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "database-password",
+                                                "name": "${NAME}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MYSQL_DATABASE",
+                                        "value": "${DATABASE_NAME}"
+                                    }
+                                ],
+                                "image": "image-registry.openshift-image-registry.svc:5000/openshift/mysql:8.0-el8",
+                                "livenessProbe": {
+                                    "initialDelaySeconds": 30,
+                                    "tcpSocket": {
+                                        "port": 3306
+                                    },
+                                    "timeoutSeconds": 1
+                                },
+                                "name": "mysql",
+                                "ports": [
+                                    {
+                                        "containerPort": 3306
+                                    }
+                                ],
+                                "readinessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "/bin/sh",
+                                            "-i",
+                                            "-c",
+                                            "MYSQL_PWD='${DATABASE_PASSWORD}' mysql -h 127.0.0.1 -u ${DATABASE_USER} -D ${DATABASE_NAME} -e 'SELECT 1'"
+                                        ]
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1
+                                },
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/var/lib/mysql",
+                                        "name": "data"
+                                    }
+                                ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "emptyDir": {},
+                                "name": "data"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "name": "NAME",
+            "displayName": "Name",
+            "description": "The name assigned to all of the app objects defined in this template.",
+            "value": "php-app",
+            "required": true
+        },
+        {
+            "name": "NAMESPACE",
+            "displayName": "Namespace",
+            "description": "The OpenShift Namespace where the S2I biulder ImageStream resides.",
+            "value": "openshift",
+            "required": true
+        },
+        {
+            "name": "SOURCE_REPOSITORY_URL",
+            "displayName": "Git Repository URL",
+            "description": "The URL of the repository with your application source code.",
+            "required": true
+        },
+        {
+            "name": "SOURCE_REPOSITORY_REF",
+            "displayName": "Git Reference",
+            "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch."
+        },
+        {
+            "name": "CONTEXT_DIR",
+            "displayName": "Context Directory",
+            "description": "Set this to the relative path to your project if it is not in the root of your repository."
+        },
+        {
+            "name": "APPLICATION_DOMAIN",
+            "displayName": "Application Hostname",
+            "description": "The exposed hostname that will route to the PHP app service, if left blank a value will be defaulted."
+        },
+        {
+            "name": "GITHUB_WEBHOOK_SECRET",
+            "displayName": "GitHub Webhook Secret",
+            "description": "Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{40}"
+        },
+        {
+            "name": "DATABASE_SERVICE_NAME",
+            "displayName": "Database Service Name",
+            "value": "mysql",
+            "required": true
+        },
+        {
+            "name": "DATABASE_NAME",
+            "displayName": "Database Name",
+            "value": "phpapp",
+            "required": true
+        },
+        {
+            "name": "DATABASE_USER",
+            "displayName": "Database User",
+            "value": "php",
+            "required": true
+        },
+        {
+            "name": "DATABASE_PASSWORD",
+            "displayName": "Database Password",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{16}"
+        }
+    ],
+    "labels": {
+        "template": "php-mysql-ephemeral"
+    }
+}
+[student@workstation ~]$ source /usr/local/etc/ocp4.config
+[student@workstation ~]$ cat /usr/local/etc/ocp4.config
+RHT_OCP4_MASTER_API=https://api.ocp4.example.com:6443/
+RHT_OCP4_WILDCARD_DOMAIN=apps.ocp4.example.com
+RHT_OCP4_NEXUS_SERVER=nexus-common.apps.na410.prod.nextcle.com
+RHT_OCP4_MYSQL_SERVER=mysql.ocp-na46a.prod.ole.redhat.com
+RHT_OCP4_DEV_USER=developer
+RHT_OCP4_DEV_PASSWORD=developer
+RHT_OCP4_GITHUB_USER=leonardotorresadiera
+RHT_OCP4_QUAY_USER=leonardo_adiera
+[student@workstation ~]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+Login successful.
+
+You don't have any projects. You can try to create a new project, by running
+
+    oc new-project <projectname>
+
+[student@workstation ~]$ oc get templates -n openshift | grep php | grep mysql
+cakephp-mysql-example                           An example CakePHP application with a MySQL database. For more information ab...   21 (4 blank)      8
+cakephp-mysql-persistent                        An example CakePHP application with a MySQL database. For more information ab...   22 (4 blank)      9
+[student@workstation ~]$ oc new-project ${RHT_OCP4_DEV_USER}-common
+Now using project "developer-common" on server "https://api.ocp4.example.com:6443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app rails-postgresql-example
+
+to build a new example application in Ruby. Or use kubectl to deploy a simple Kubernetes application:
+
+    kubectl create deployment hello-node --image=k8s.gcr.io/e2e-test-images/agnhost:2.33 -- /agnhost serve-hostname
+
+[student@workstation ~]$ oc create -f ~/DO288/labs/build-template/php-mysql-ephemeral.json
+template.template.openshift.io/php-mysql-ephemeral created
+[student@workstation ~]$ oc new -project ${RHT_OCP4_DEV_USER}-build-template
+error: unknown command "new" for "oc"
+
+Did you mean this?
+	get
+	new-app
+	new-build
+	new-project
+	set
+[student@workstation ~]$ oc new-project ${RHT_OCP4_DEV_USER}-build-template
+Now using project "developer-build-template" on server "https://api.ocp4.example.com:6443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app rails-postgresql-example
+
+to build a new example application in Ruby. Or use kubectl to deploy a simple Kubernetes application:
+
+    kubectl create deployment hello-node --image=k8s.gcr.io/e2e-test-images/agnhost:2.33 -- /agnhost serve-hostname
+
+[student@workstation ~]$ oc describe template php-mysql-ephemeral -n developer-common
+Name:		php-mysql-ephemeral
+Namespace:	developer-common
+Created:	About a minute ago
+Labels:		<none>
+Description:	A  PHP application with a MySQL database.
+		WARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.
+Annotations:	iconClass=icon-php
+		openshift.io/display-name=PHP + MySQL (Ephemeral)
+		tags=php
+		template.openshift.io/long-description=This template defines resources needed to develop a PHP application, including a build configuration, application deployment configuration, and database deployment configuration.  The database is stored in non-persistent storage, so this configuration should be used for experimental purposes only.
+		template.openshift.io/provider-display-name=Red Hat Training
+
+Parameters:		 
+    Name:		NAME
+    Display Name:	Name
+    Description:	The name assigned to all of the app objects defined in this template.
+    Required:		true
+    Value:		php-app
+
+    Name:		NAMESPACE
+    Display Name:	Namespace
+    Description:	The OpenShift Namespace where the S2I biulder ImageStream resides.
+    Required:		true
+    Value:		openshift
+
+    Name:		SOURCE_REPOSITORY_URL
+    Display Name:	Git Repository URL
+    Description:	The URL of the repository with your application source code.
+    Required:		true
+    Value:		<none>
+
+    Name:		SOURCE_REPOSITORY_REF
+    Display Name:	Git Reference
+    Description:	Set this to a branch name, tag or other ref of your repository if you are not using the default branch.
+    Required:		false
+    Value:		<none>
+
+    Name:		CONTEXT_DIR
+    Display Name:	Context Directory
+    Description:	Set this to the relative path to your project if it is not in the root of your repository.
+    Required:		false
+    Value:		<none>
+
+    Name:		APPLICATION_DOMAIN
+    Display Name:	Application Hostname
+    Description:	The exposed hostname that will route to the PHP app service, if left blank a value will be defaulted.
+    Required:		false
+    Value:		<none>
+
+    Name:		GITHUB_WEBHOOK_SECRET
+    Display Name:	GitHub Webhook Secret
+    Description:	Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.
+    Required:		false
+    Generated:		expression
+    From:		[a-zA-Z0-9]{40}
+
+    Name:		DATABASE_SERVICE_NAME
+    Display Name:	Database Service Name
+    Required:		true
+    Value:		mysql
+
+    Name:		DATABASE_NAME
+    Display Name:	Database Name
+    Required:		true
+    Value:		phpapp
+
+    Name:		DATABASE_USER
+    Display Name:	Database User
+    Required:		true
+    Value:		php
+
+    Name:		DATABASE_PASSWORD
+    Display Name:	Database Password
+    Required:		false
+    Generated:		expression
+    From:		[a-zA-Z0-9]{16}
+
+
+Object Labels:	template=php-mysql-ephemeral
+
+Message:	The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.
+		
+
+Objects:				 
+    Secret				${NAME}
+    Service				${NAME}
+    Route.route.openshift.io		${NAME}
+    ImageStream.image.openshift.io	${NAME}
+    BuildConfig.build.openshift.io	${NAME}
+    Deployment.apps			${NAME}
+    Service				${DATABASE_SERVICE_NAME}
+    Deployment.apps			${DATABASE_SERVICE_NAME}
+[student@workstation ~]$ cat ~/DO288/labs/build-template/create-app.sh
+#!/bin/sh
+
+source /usr/local/etc/ocp4.config
+
+oc new-app --template ${RHT_OCP4_DEV_USER}-common/php-mysql-ephemeral \
+  -p NAME=quotesapi \
+  -p APPLICATION_DOMAIN=quote-${RHT_OCP4_DEV_USER}.${RHT_OCP4_WILDCARD_DOMAIN} \
+  -p SOURCE_REPOSITORY_URL=https://github.com/${RHT_OCP4_GITHUB_USER}/DO288-apps \
+  -p CONTEXT_DIR=quotes \
+  -p DATABASE_SERVICE_NAME=quotesdb \
+  -p DATABASE_USER=user1 \
+  -p DATABASE_PASSWORD=mypa55 \
+  --name quotes
+
+[student@workstation ~]$ ~/DO288/labs/build-template/create-app.sh
+--> Deploying template "developer-common/php-mysql-ephemeral" for "developer-common/php-mysql-ephemeral" to project developer-build-template
+
+     PHP + MySQL (Ephemeral)
+     ---------
+     A  PHP application with a MySQL database.
+     WARNING: Any data stored will be lost upon pod destruction. Only use this template for testing.
+
+     The following service(s) have been created in your project: quotesapi, quotesdb.
+
+     * With parameters:
+        * Name=quotesapi
+        * Namespace=openshift
+        * Git Repository URL=https://github.com/leonardotorresadiera/DO288-apps
+        * Git Reference=
+        * Context Directory=quotes
+        * Application Hostname=quote-developer.apps.ocp4.example.com
+        * GitHub Webhook Secret=RpjGKwdFrBLxsRtJxcvh6IwWFTX7jJ7u4K6bYFMU # generated
+        * Database Service Name=quotesdb
+        * Database Name=phpapp
+        * Database User=user1
+        * Database Password=mypa55
+
+--> Creating resources ...
+    secret "quotesapi" created
+    service "quotesapi" created
+    route.route.openshift.io "quotesapi" created
+    imagestream.image.openshift.io "quotesapi" created
+    buildconfig.build.openshift.io "quotesapi" created
+    deployment.apps "quotesapi" created
+    service "quotesdb" created
+    deployment.apps "quotesdb" created
+--> Success
+    Access your application via route 'quote-developer.apps.ocp4.example.com' 
+    Build scheduled, use 'oc logs -f buildconfig/quotesapi' to track its progress.
+    Run 'oc status' to view your app.
+[student@workstation ~]$ oc logs -f bc/quotesapi
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	5dcc01b9a4babb847a91608666e5277a3cdef92a (Use Thorntail 2.4.0)
+	Author:	Alex Corcoles <alexcorcoles@redhat.com>
+	Date:	Mon Sep 12 13:31:28 2022 +0200
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-04T22:54:17Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1004 22:54:17.721263       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:040356e7753a683199a12de051a773e1ba0eb7c3fd3e66ded086b8f9f5a58eaa...
+Getting image source signatures
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying blob sha256:e0dc1b5a4801cf6fec23830d5fcea4b3fac076b9680999c49935e5b50a17e63b
+Copying blob sha256:b7031b45c15aced7f2d13ed3cbde7de9a325d8d26cb1ced2f78cf525468ccce2
+Copying config sha256:6aea525b3b41edd7235d78cd6270f9df475920ed010bc2d5a82c44da31cbce8c
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:040356e7753a683199a12de051a773e1ba0eb7c3fd3e66ded086b8f9f5a58eaa
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:040356e7753a683199a12de051a773e1ba0eb7c3fd3e66ded086b8f9f5a58eaa
+STEP 2/9: LABEL "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="quotes"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:040356e7753a683199a12de051a773e1ba0eb7c3fd3e66ded086b8f9f5a58eaa"       "io.openshift.build.commit.author"="Alex Corcoles <alexcorcoles@redhat.com>"       "io.openshift.build.commit.date"="Mon Sep 12 13:31:28 2022 +0200"       "io.openshift.build.commit.id"="5dcc01b9a4babb847a91608666e5277a3cdef92a"       "io.openshift.build.commit.ref"="main"       "io.openshift.build.commit.message"="Use Thorntail 2.4.0"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="quotesapi-1"     OPENSHIFT_BUILD_NAMESPACE="developer-build-template"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="5dcc01b9a4babb847a91608666e5277a3cdef92a"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source...
+=> sourcing 20-copy-config.sh ...
+---> 22:54:36     Processing additional arbitrary httpd configuration provided by s2i ...
+=> sourcing 00-documentroot.conf ...
+=> sourcing 50-mpm-tuning.conf ...
+=> sourcing 40-ssl-certs.sh ...
+STEP 9/9: CMD /usr/libexec/s2i/run
+COMMIT temp.builder.openshift.io/developer-build-template/quotesapi-1:7abe7a25
+time="2022-10-04T22:54:36Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:5966005eac8d0b52bf676cd20f1ffb3435fe4d8245a3afadcd27b0b9e07c096b
+Copying blob sha256:9936c6aaa811c2084fe2c1034e24cbecc3d3ac8db8fe987395723b19c678655b
+Copying blob sha256:0ce645f59bfcd24ff75234e6567b6945cb9fd16fe18082485924d6db10d53326
+Copying blob sha256:2d6812ade9b74a40c89aab889f858547544aff786125510af25ef98c8dd9a943
+Copying blob sha256:2e5b127de5e8b4d2af5f8b75712cf7c13f51b38bc1ec8cedd1fa60604cdc20be
+Copying blob sha256:540ba6f4206422c8e228354d9c75b855b1fe098dc5094208d5a94c52429c5860
+Copying config sha256:1534c389cc9c1efa382163898930925a9bb0e1889a9bfac74174efa418202ee1
+Writing manifest to image destination
+Storing signatures
+--> 1534c389cc9
+Successfully tagged temp.builder.openshift.io/developer-build-template/quotesapi-1:7abe7a25
+1534c389cc9c1efa382163898930925a9bb0e1889a9bfac74174efa418202ee1
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi:latest ...
+Getting image source signatures
+Copying blob sha256:540ba6f4206422c8e228354d9c75b855b1fe098dc5094208d5a94c52429c5860
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying blob sha256:b7031b45c15aced7f2d13ed3cbde7de9a325d8d26cb1ced2f78cf525468ccce2
+Copying blob sha256:e0dc1b5a4801cf6fec23830d5fcea4b3fac076b9680999c49935e5b50a17e63b
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying config sha256:1534c389cc9c1efa382163898930925a9bb0e1889a9bfac74174efa418202ee1
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi@sha256:fff46ae9c65b0f1ff102ba9cfec3c02aaa0c8d3d50c832994f783ef11aefaf60
+Push successful
+[student@workstation ~]$ oc get route
+NAME        HOST/PORT                               PATH   SERVICES    PORT    TERMINATION   WILDCARD
+quotesapi   quote-developer.apps.ocp4.example.com          quotesapi   <all>                 None
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS             RESTARTS   AGE
+quotesapi-1-build            0/1     Completed          0          59s
+quotesapi-5f64ccbc68-kthmt   0/1     ImagePullBackOff   0          59s
+quotesdb-56566995c7-s4zs9    1/1     Running            0          59s
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS         RESTARTS   AGE
+quotesapi-1-build            0/1     Completed      0          67s
+quotesapi-5f64ccbc68-kthmt   0/1     ErrImagePull   0          67s
+quotesdb-56566995c7-s4zs9    1/1     Running        0          67s
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS         RESTARTS   AGE
+quotesapi-1-build            0/1     Completed      0          69s
+quotesapi-5f64ccbc68-kthmt   0/1     ErrImagePull   0          69s
+quotesdb-56566995c7-s4zs9    1/1     Running        0          69s
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS             RESTARTS   AGE
+quotesapi-1-build            0/1     Completed          0          77s
+quotesapi-5f64ccbc68-kthmt   0/1     ImagePullBackOff   0          77s
+quotesdb-56566995c7-s4zs9    1/1     Running            0          77s
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS             RESTARTS   AGE
+quotesapi-1-build            0/1     Completed          0          84s
+quotesapi-5f64ccbc68-kthmt   0/1     ImagePullBackOff   0          84s
+quotesdb-56566995c7-s4zs9    1/1     Running            0          84s
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS             RESTARTS   AGE
+quotesapi-1-build            0/1     Completed          0          86s
+quotesapi-5f64ccbc68-kthmt   0/1     ImagePullBackOff   0          86s
+quotesdb-56566995c7-s4zs9    1/1     Running            0          86s
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS             RESTARTS   AGE
+quotesapi-1-build            0/1     Completed          0          93s
+quotesapi-5f64ccbc68-kthmt   0/1     ImagePullBackOff   0          93s
+quotesdb-56566995c7-s4zs9    1/1     Running            0          93s
+[student@workstation ~]$ oc describe svc quotesdb | grep Endpoints
+Endpoints:         10.8.0.88:3306
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS      RESTARTS   AGE
+quotesapi-1-build            0/1     Completed   0          2m5s
+quotesapi-5f64ccbc68-kthmt   1/1     Running     0          2m5s
+quotesdb-56566995c7-s4zs9    1/1     Running     0          2m5s
+[student@workstation ~]$ oc describe pod quotesdb-56566995c7-s4zs9 
+Name:         quotesdb-56566995c7-s4zs9
+Namespace:    developer-build-template
+Priority:     0
+Node:         master01/192.168.50.10
+Start Time:   Tue, 04 Oct 2022 18:53:53 -0400
+Labels:       app=quotesdb
+              pod-template-hash=56566995c7
+Annotations:  k8s.v1.cni.cncf.io/network-status:
+                [{
+                    "name": "openshift-sdn",
+                    "interface": "eth0",
+                    "ips": [
+                        "10.8.0.88"
+                    ],
+                    "default": true,
+                    "dns": {}
+                }]
+              k8s.v1.cni.cncf.io/networks-status:
+                [{
+                    "name": "openshift-sdn",
+                    "interface": "eth0",
+                    "ips": [
+                        "10.8.0.88"
+                    ],
+                    "default": true,
+                    "dns": {}
+                }]
+              openshift.io/generated-by: OpenShiftNewApp
+              openshift.io/scc: restricted
+Status:       Running
+IP:           10.8.0.88
+IPs:
+  IP:           10.8.0.88
+Controlled By:  ReplicaSet/quotesdb-56566995c7
+Containers:
+  mysql:
+    Container ID:   cri-o://3c29b60e8d3acdd6ceff0fe817c33b38f9916196b3f3767db00be299361002e7
+    Image:          image-registry.openshift-image-registry.svc:5000/openshift/mysql:8.0-el8
+    Image ID:       image-registry.openshift-image-registry.svc:5000/openshift/mysql@sha256:f9920a6ff5939a01074c4eff97230bcd14f453a5a76d5a5801bed07934497bf8
+    Port:           3306/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Tue, 04 Oct 2022 18:54:08 -0400
+    Ready:          True
+    Restart Count:  0
+    Liveness:       tcp-socket :3306 delay=30s timeout=1s period=10s #success=1 #failure=3
+    Readiness:      exec [/bin/sh -i -c MYSQL_PWD='mypa55' mysql -h 127.0.0.1 -u user1 -D phpapp -e 'SELECT 1'] delay=5s timeout=1s period=10s #success=1 #failure=3
+    Environment:
+      MYSQL_USER:           <set to the key 'database-user' in secret 'quotesapi'>      Optional: false
+      MYSQL_ROOT_PASSWORD:  <set to the key 'database-password' in secret 'quotesapi'>  Optional: false
+      MYSQL_PASSWORD:       <set to the key 'database-password' in secret 'quotesapi'>  Optional: false
+      MYSQL_DATABASE:       phpapp
+    Mounts:
+      /var/lib/mysql from data (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-swfb6 (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  data:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kube-api-access-swfb6:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+    ConfigMapName:           openshift-service-ca.crt
+    ConfigMapOptional:       <nil>
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason          Age    From               Message
+  ----     ------          ----   ----               -------
+  Normal   Scheduled       2m37s  default-scheduler  Successfully assigned developer-build-template/quotesdb-56566995c7-s4zs9 to master01
+  Normal   AddedInterface  2m35s  multus             Add eth0 [10.8.0.88/23] from openshift-sdn
+  Normal   Pulling         2m35s  kubelet            Pulling image "image-registry.openshift-image-registry.svc:5000/openshift/mysql:8.0-el8"
+  Normal   Pulled          2m23s  kubelet            Successfully pulled image "image-registry.openshift-image-registry.svc:5000/openshift/mysql:8.0-el8" in 12.233711956s
+  Normal   Created         2m22s  kubelet            Created container mysql
+  Normal   Started         2m22s  kubelet            Started container mysql
+  Warning  Unhealthy       2m17s  kubelet            Readiness probe failed: sh: cannot set terminal process group (-1): Inappropriate ioctl for device
+sh: no job control in this shell
+ERROR 2003 (HY000): Can't connect to MySQL server on '127.0.0.1:3306' (111)
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS      RESTARTS   AGE
+quotesapi-1-build            0/1     Completed   0          3m4s
+quotesapi-5f64ccbc68-kthmt   1/1     Running     0          3m4s
+quotesdb-56566995c7-s4zs9    1/1     Running     0          3m4s
+[student@workstation ~]$ oc describe pod quotesapi-5f64ccbc68-kthmt 
+Name:         quotesapi-5f64ccbc68-kthmt
+Namespace:    developer-build-template
+Priority:     0
+Node:         master01/192.168.50.10
+Start Time:   Tue, 04 Oct 2022 18:53:53 -0400
+Labels:       app=quotesapi
+              pod-template-hash=5f64ccbc68
+Annotations:  k8s.v1.cni.cncf.io/network-status:
+                [{
+                    "name": "openshift-sdn",
+                    "interface": "eth0",
+                    "ips": [
+                        "10.8.0.86"
+                    ],
+                    "default": true,
+                    "dns": {}
+                }]
+              k8s.v1.cni.cncf.io/networks-status:
+                [{
+                    "name": "openshift-sdn",
+                    "interface": "eth0",
+                    "ips": [
+                        "10.8.0.86"
+                    ],
+                    "default": true,
+                    "dns": {}
+                }]
+              openshift.io/generated-by: OpenShiftNewApp
+              openshift.io/scc: restricted
+Status:       Running
+IP:           10.8.0.86
+IPs:
+  IP:           10.8.0.86
+Controlled By:  ReplicaSet/quotesapi-5f64ccbc68
+Containers:
+  php-app:
+    Container ID:   cri-o://6a8a743a424018cc52585435a466bfb4cd641219b85ad953c5986c0cb0ff77b9
+    Image:          image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi:latest
+    Image ID:       image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi@sha256:fff46ae9c65b0f1ff102ba9cfec3c02aaa0c8d3d50c832994f783ef11aefaf60
+    Port:           8080/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Tue, 04 Oct 2022 18:55:36 -0400
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      DATABASE_SERVICE_NAME:  quotesdb
+      DATABASE_NAME:          phpapp
+      DATABASE_USER:          <set to the key 'database-user' in secret 'quotesapi'>      Optional: false
+      DATABASE_PASSWORD:      <set to the key 'database-password' in secret 'quotesapi'>  Optional: false
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-hdbrg (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  kube-api-access-hdbrg:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+    ConfigMapName:           openshift-service-ca.crt
+    ConfigMapOptional:       <nil>
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason          Age                    From               Message
+  ----     ------          ----                   ----               -------
+  Normal   Scheduled       3m39s                  default-scheduler  Successfully assigned developer-build-template/quotesapi-5f64ccbc68-kthmt to master01
+  Normal   AddedInterface  3m37s                  multus             Add eth0 [10.8.0.86/23] from openshift-sdn
+  Warning  Failed          2m53s (x3 over 3m37s)  kubelet            Failed to pull image "image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi:latest": rpc error: code = Unknown desc = reading manifest latest in image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi: manifest unknown: manifest unknown
+  Warning  Failed          2m53s (x3 over 3m37s)  kubelet            Error: ErrImagePull
+  Normal   BackOff         2m16s (x6 over 3m36s)  kubelet            Back-off pulling image "image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi:latest"
+  Warning  Failed          2m16s (x6 over 3m36s)  kubelet            Error: ImagePullBackOff
+  Normal   Pulling         2m5s (x4 over 3m37s)   kubelet            Pulling image "image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi:latest"
+  Normal   Pulled          116s                   kubelet            Successfully pulled image "image-registry.openshift-image-registry.svc:5000/developer-build-template/quotesapi:latest" in 8.647124569s
+  Normal   Created         116s                   kubelet            Created container php-app
+  Normal   Started         116s                   kubelet            Started container php-app
+[student@workstation ~]$ oc rsh quotesapi-5f64ccbc68-kthmt -c 'echo > /dev/tcp/$DATABASE_SERVICE_NAME/3306 && echo OK || echo FAIL'
+ERRO[0000] exec failed: unable to start container process: exec: "-c": executable file not found in $PATH 
+command terminated with exit code 255
+[student@workstation ~]$ oc rsh quotesapi-5f64ccbc68-kthmt bash -c 'echo > /dev/tcp/$DATABASE_SERVICE_NAME/3306 && echo OK || echo FAIL'
+OK
+[student@workstation ~]$ oc logs quotesapi-5f64ccbc68-kthmt 
+=> sourcing 20-copy-config.sh ...
+---> 22:55:36     Processing additional arbitrary httpd configuration provided by s2i ...
+=> sourcing 00-documentroot.conf ...
+=> sourcing 50-mpm-tuning.conf ...
+=> sourcing 40-ssl-certs.sh ...
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.8.0.86. Set the 'ServerName' directive globally to suppress this message
+[Tue Oct 04 22:55:37.017378 2022] [ssl:warn] [pid 1] AH01909: 10.8.0.86:8443:0 server certificate does NOT include an ID which matches the server name
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.8.0.86. Set the 'ServerName' directive globally to suppress this message
+[Tue Oct 04 22:55:37.092077 2022] [ssl:warn] [pid 1] AH01909: 10.8.0.86:8443:0 server certificate does NOT include an ID which matches the server name
+[Tue Oct 04 22:55:37.092227 2022] [lbmethod_heartbeat:notice] [pid 1] AH02282: No slotmem from mod_heartmonitor
+[Tue Oct 04 22:55:37.092294 2022] [http2:warn] [pid 1] AH10034: The mpm module (prefork.c) is not supported by mod_http2. The mpm determines how things are processed in your server. HTTP/2 has more demands in this regard and the currently selected mpm will just not do. This is an advisory warning. Your server will continue to work, but the HTTP/2 protocol will be inactive.
+[Tue Oct 04 22:55:37.210041 2022] [mpm_prefork:notice] [pid 1] AH00163: Apache/2.4.37 (Red Hat Enterprise Linux) OpenSSL/1.1.1k configured -- resuming normal operations
+[Tue Oct 04 22:55:37.210067 2022] [core:notice] [pid 1] AH00094: Command line: 'httpd -D FOREGROUND'
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS      RESTARTS   AGE
+quotesapi-1-build            0/1     Completed   0          6m26s
+quotesapi-5f64ccbc68-kthmt   1/1     Running     0          6m26s
+quotesdb-56566995c7-s4zs9    1/1     Running     0          6m26s
+[student@workstation ~]$ oc cp ~/DO288/labs/build-template/quote.sql quotesdb-56566995c7-s4zs9:/tmp/quote.sql
+[student@workstation ~]$ oc get pods
+NAME                         READY   STATUS      RESTARTS   AGE
+quotesapi-1-build            0/1     Completed   0          7m11s
+quotesapi-5f64ccbc68-kthmt   1/1     Running     0          7m11s
+quotesdb-56566995c7-s4zs9    1/1     Running     0          7m11s
+[student@workstation ~]$ oc rsh -t quotesdb-56566995c7-s4zs9
+sh-4.4$ mysql -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE < /tmp/quote.sql
+mysql: [Warning] Using a password on the command line interface can be insecure.
+sh-4.4$ exit
+exit
+[student@workstation ~]$ curl -si http://quote-$RHT_OCP4_DEV_USER.$RHT_OCP4_WILDCARD_DOMAIN/get.php
+HTTP/1.1 200 OK
+date: Tue, 04 Oct 2022 23:02:22 GMT
+server: Apache/2.4.37 (Red Hat Enterprise Linux) OpenSSL/1.1.1k
+content-length: 73
+content-type: text/html; charset=UTF-8
+set-cookie: 929ade1926019be09cacb85b5a445e94=2313c3379ef7d3201113575e452a7355; path=/; HttpOnly
+cache-control: private
+
+Always remember that you are absolutely unique. Just like everyone else.
+[student@workstation ~]$ pwd
+/home/student
+[student@workstation ~]$ ls -l
+total 4
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student   35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student 4096 Oct  4 18:27 DO288-apps
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student    6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student  193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Templates
+drwxr-xr-x.  2 student student    6 Aug 30 11:18 Videos
+[student@workstation ~]$ zip -r DO288-labsolutions-build-template.zip DO288
+  adding: DO288/ (stored 0%)
+  adding: DO288/labs/ (stored 0%)
+  adding: DO288/labs/build-template/ (stored 0%)
+  adding: DO288/labs/build-template/quote.sql (deflated 40%)
+  adding: DO288/labs/build-template/create-app.sh (deflated 37%)
+  adding: DO288/labs/build-template/php-mysql-ephemeral.json (deflated 85%)
+  adding: DO288/solutions/ (stored 0%)
+[student@workstation ~]$ oc delete project ${RHT_OCP4_DEV_USER}-build-template
+project.project.openshift.io "developer-build-template" deleted
+[student@workstation ~]$ oc delete project ${RHT_OCP4_DEV_USER}-common
+project.project.openshift.io "developer-common" deleted
+lab b[student@workstation ~]$ lab build-template finish
+
+Completing GE: Managing an Application with the CLI
+
+ · Remove exercise files.......................................  SUCCESS
+ · Log in on OpenShift.........................................  SUCCESS
+
+Please use start if you wish to do the exercise again.
+
+[student@workstation ~]$ 
+
