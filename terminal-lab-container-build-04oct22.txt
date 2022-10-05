@@ -1,0 +1,642 @@
+[student@workstation ~]$ ls -l
+total 116
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student    35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student  4096 Oct  4 18:27 DO288-apps
+-rw-rw-r--.  1 student student  4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+-rw-rw-r--.  1 student student  1628 Oct  4 19:16 DO288-lab-solutions-source-build.zip
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student     6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student   193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student 71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+-rw-r--r--.  1 student student 25177 Oct  4 19:17 terminal-lab-source-build-04oct22.txt
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Videos
+[student@workstation ~]$ ls -l
+total 116
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student    35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student  4096 Oct  4 20:14 DO288-apps
+-rw-rw-r--.  1 student student  4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+-rw-rw-r--.  1 student student  1628 Oct  4 19:16 DO288-lab-solutions-source-build.zip
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student     6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student   193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student 71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+-rw-r--r--.  1 student student 25177 Oct  4 19:17 terminal-lab-source-build-04oct22.txt
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Videos
+[student@workstation ~]$ 
+[student@workstation ~]$ lab container-build start
+
+Checking prerequisites for Guided Exercise: Building Container Images
+
+ Checking local clone of the applications repository:
+ · Folder '/home/student/DO288-apps' is a git repo.............  SUCCESS
+ · Git repo '/home/student/DO288-apps' has no pending changes..  SUCCESS
+ Verify the OpenShift cluster is running:
+ · Router pods are available...................................  SUCCESS
+ · OAuth pods are available....................................  SUCCESS
+ · API pods are available......................................  SUCCESS
+ · No cluster operators are progressing........................  SUCCESS
+ · Control plane node 'master01' is ready......................  SUCCESS
+ Checking required artifacts:
+ · Image 'redhattraining/httpd-parent' is available............  SUCCESS
+ Checking for conflicts with existing OpenShift projects:
+ · Project 'developer-container-build' is absent...............  SUCCESS
+
+Setting up the classroom for Guided Exercise: Building Container Images
+
+ · Download exercise files.....................................  SUCCESS
+ · Download solution files.....................................  SUCCESS
+
+Overall start status...........................................  SUCCESS
+
+[student@workstation ~]$ pwd
+/home/student
+[student@workstation ~]$ cat ~/DO288/labs/container-build/httpd-parent/ Containerfile
+cat: /home/student/DO288/labs/container-build/httpd-parent/: Is a directory
+cat: Containerfile: No such file or directory
+[student@workstation ~]$ cat ~/DO288/labs/container-build/httpd-parent/Containerfile
+FROM registry.access.redhat.com/ubi8/ubi:8.0
+
+MAINTAINER Red Hat Training <training@redhat.com>
+
+# DocumentRoot for Apache
+ENV DOCROOT=/var/www/html 
+
+
+RUN   yum install -y --nodocs --disableplugin=subscription-manager httpd && \
+      yum clean all --disableplugin=subscription-manager -y && \
+      echo "Hello from the httpd-parent container!" > ${DOCROOT}/index.html
+
+# Allows child images to inject their own content into DocumentRoot
+ONBUILD COPY src/ ${DOCROOT}/
+
+EXPOSE 80
+
+# This stuff is needed to ensure a clean start
+RUN rm -rf /run/httpd && mkdir /run/httpd
+
+# Run as the root user
+USER root
+
+# Launch httpd
+CMD /usr/sbin/httpd -DFOREGROUND
+[student@workstation ~]$ source /usr/local/etc/ocp4.config
+[student@workstation ~]$ cd DO288-apps/
+[student@workstation DO288-apps]$ git checkout main
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+[student@workstation DO288-apps]$ git checkout -b container-build
+Switched to a new branch 'container-build'
+[student@workstation DO288-apps]$ git push -u origin container-build
+Username for 'https://github.com': leonardotorresochoa
+Password for 'https://leonardotorresochoa@github.com': 
+Total 0 (delta 0), reused 0 (delta 0), pack-reused 0
+remote: 
+remote: Create a pull request for 'container-build' on GitHub by visiting:
+remote:      https://github.com/leonardotorresadiera/DO288-apps/pull/new/container-build
+remote: 
+To https://github.com/leonardotorresadiera/DO288-apps.git
+ * [new branch]      container-build -> container-build
+Branch 'container-build' set up to track remote branch 'container-build' from 'origin'.
+[student@workstation DO288-apps]$ cat ~/DO288-apps/container-build/Containerfile
+# Use the httpd-parent image as base
+FROM quay.io/redhattraining/httpd-parent
+[student@workstation DO288-apps]$ cd ~/DO288-apps/container-build/
+[student@workstation container-build]$ ls -l
+total 4
+-rw-rw-r--. 1 student student 78 Oct  3 19:15 Containerfile
+drwxrwxr-x. 2 student student 24 Oct  3 19:15 src
+[student@workstation container-build]$ cd src/
+[student@workstation src]$ ls -l
+total 4
+-rw-rw-r--. 1 student student 87 Oct  3 19:15 index.html
+[student@workstation src]$ nano index.html 
+[student@workstation src]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+Login successful.
+
+You don't have any projects. You can try to create a new project, by running
+
+    oc new-project <projectname>
+
+[student@workstation src]$ oc new-project ${RHT_OCP4_DEV_USER}-container-build
+Now using project "developer-container-build" on server "https://api.ocp4.example.com:6443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app rails-postgresql-example
+
+to build a new example application in Ruby. Or use kubectl to deploy a simple Kubernetes application:
+
+    kubectl create deployment hello-node --image=k8s.gcr.io/e2e-test-images/agnhost:2.33 -- /agnhost serve-hostname
+
+[student@workstation src]$ ls -l
+total 4
+-rw-rw-r--. 1 student student 87 Oct  3 19:15 index.html
+[student@workstation src]$ c d..
+bash: c: command not found...
+[student@workstation src]$ cd ..
+[student@workstation container-build]$ ls -l
+total 4
+-rw-rw-r--. 1 student student 78 Oct  3 19:15 Containerfile
+drwxrwxr-x. 2 student student 24 Oct  3 19:15 src
+[student@workstation container-build]$ pwd
+/home/student/DO288-apps/container-build
+[student@workstation container-build]$ cd ..
+[student@workstation DO288-apps]$ ls -l
+total 16
+drwxrwxr-x. 2 student student    57 Oct  3 19:15 app-config
+drwxrwxr-x. 9 student student   196 Oct  3 19:15 books
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 build-app
+drwxrwxr-x. 3 student student    38 Oct  3 19:15 container-build
+drwxrwxr-x. 2 student student    20 Oct  3 19:15 go-hello
+drwxrwxr-x. 3 student student    60 Oct  3 19:15 hello-java
+drwxrwxr-x. 2 student student    63 Oct  3 19:15 hello-world-nginx
+drwxrwxr-x. 2 student student    24 Oct  3 19:15 html-helloworld
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 java-serverhost
+-rw-rw-r--. 1 student student 11343 Oct  3 19:15 LICENSE
+drwxrwxr-x. 3 student student    71 Oct  3 19:15 micro-java
+drwxrwxr-x. 3 student student    71 Oct  3 19:15 movies
+drwxrwxr-x. 2 student student    62 Oct  3 19:15 nexus3
+drwxrwxr-x. 2 student student    40 Oct  4 21:10 nodejs-helloworld
+drwxrwxr-x. 2 student student    41 Oct  3 19:15 php-hello-dockerfile
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 php-helloworld
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 php-scale
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 post-commit
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 probes
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 quip
+drwxrwxr-x. 2 student student    38 Oct  3 19:15 quotes
+-rw-rw-r--. 1 student student   205 Oct  3 19:15 README.md
+drwxrwxr-x. 3 student student    36 Oct  3 19:15 s2i-scripts
+drwxrwxr-x. 2 student student    25 Oct  3 19:15 simple-pipeline
+drwxrwxr-x. 3 student student    88 Oct  3 19:15 todo-api
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 todo-api-micro
+drwxrwxr-x. 3 student student   164 Oct  3 19:15 todo-backend
+drwxrwxr-x. 4 student student   195 Oct  3 19:15 todo-frontend
+drwxrwxr-x. 5 student student    85 Oct  3 19:15 todo-single
+drwxrwxr-x. 3 student student   115 Oct  3 19:15 todo-ssr
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 trigger-builds
+drwxrwxr-x. 2 student student    24 Oct  4 18:27 ubi-echo
+drwxrwxr-x. 2 student student    39 Oct  3 19:15 ubi-info
+drwxrwxr-x. 2 student student    24 Oct  3 19:15 ubi-sleep
+[student@workstation DO288-apps]$ podman build --layers=false -t do288-apache ./container-build
+STEP 1/1: FROM quay.io/redhattraining/httpd-parent
+Trying to pull quay.io/redhattraining/httpd-parent:latest...
+Getting image source signatures
+Copying blob 6a5240d60dc4 done  
+Copying blob a3ed95caeb02 done  
+Copying blob 787f47dbeaac done  
+Copying blob a3ed95caeb02 done  
+Copying blob a3ed95caeb02 done  
+Copying blob 08b8c9fdec44 done  
+Copying blob a3ed95caeb02 skipped: already exists  
+Copying blob a3ed95caeb02 skipped: already exists  
+Copying blob a3ed95caeb02 skipped: already exists  
+Copying blob 408208567b9a done  
+Writing manifest to image destination
+Storing signatures
+STEP 2/2: COPY src/ ${DOCROOT}/
+COMMIT do288-apache
+Getting image source signatures
+Copying blob 24d85c895b6b skipped: already exists  
+Copying blob c613b100be16 skipped: already exists  
+Copying blob 574bcc187eda skipped: already exists  
+Copying blob 7f9108fde4a1 skipped: already exists  
+Copying blob 1edcec285c2f done  
+Copying config 067e99fc9e done  
+Writing manifest to image destination
+Storing signatures
+--> 067e99fc9e5
+Successfully tagged localhost/do288-apache:latest
+067e99fc9e5623ff4544110e8ed1affaec0febe0f59c47f9fd113e54356aabd4
+[student@workstation DO288-apps]$ podman images
+REPOSITORY                           TAG         IMAGE ID      CREATED         SIZE
+localhost/do288-apache               latest      067e99fc9e56  36 seconds ago  236 MB
+quay.io/redhattraining/httpd-parent  latest      4346d3cace25  3 years ago     236 MB
+[student@workstation DO288-apps]$ podman tag do288-apache quay.io/${RHT_OCP4_QUAY_USER}/do288-apache
+[student@workstation DO288-apps]$ podman login quay.io -u ${RHT_OCP4_QUAY_USER}
+Password: 
+Login Succeeded!
+[student@workstation DO288-apps]$ podman push --format v2s1 quay.io/${RHT_OCP4_QUAY_USER}/do288-apache
+Getting image source signatures
+Copying blob 1edcec285c2f done  
+Copying blob 574bcc187eda skipped: already exists  
+Copying blob 24d85c895b6b skipped: already exists  
+Copying blob 7f9108fde4a1 skipped: already exists  
+Copying blob c613b100be16 skipped: already exists  
+Writing manifest to image destination
+Storing signatures
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/${RHT_OCP4_QUAY_USER}/do288-apache
+W1004 21:20:13.200893    9914 dockerimagelookup.go:300] container image remote registry lookup failed: you may not have access to the container image "quay.io/leonardo_adiera/do288-apache:latest"
+error:  local file access failed with: stat quay.io/leonardo_adiera/do288-apache: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "quay.io/leonardo_adiera/do288-apache"
+
+Argument 'quay.io/leonardo_adiera/do288-apache' was classified as an image, image~source, or loaded template reference.
+
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the container storage, on remote registries, or on the local container engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/leonardo_adiera/do288-apache
+W1004 21:21:11.962455    9926 dockerimagelookup.go:300] container image remote registry lookup failed: you may not have access to the container image "quay.io/leonardo_adiera/do288-apache:latest"
+error:  local file access failed with: stat quay.io/leonardo_adiera/do288-apache: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "quay.io/leonardo_adiera/do288-apache"
+
+Argument 'quay.io/leonardo_adiera/do288-apache' was classified as an image, image~source, or loaded template reference.
+
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the container storage, on remote registries, or on the local container engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/leonardo_adiera/do288-apache
+W1004 21:23:34.394545    9962 dockerimagelookup.go:300] container image remote registry lookup failed: you may not have access to the container image "quay.io/leonardo_adiera/do288-apache:latest"
+error:  local file access failed with: stat quay.io/leonardo_adiera/do288-apache: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "quay.io/leonardo_adiera/do288-apache"
+
+Argument 'quay.io/leonardo_adiera/do288-apache' was classified as an image, image~source, or loaded template reference.
+
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the container storage, on remote registries, or on the local container engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/leonardo_adiera/do288-apache
+W1004 21:23:58.970783    9975 dockerimagelookup.go:300] container image remote registry lookup failed: you may not have access to the container image "quay.io/leonardo_adiera/do288-apache:latest"
+error:  local file access failed with: stat quay.io/leonardo_adiera/do288-apache: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "quay.io/leonardo_adiera/do288-apache"
+
+Argument 'quay.io/leonardo_adiera/do288-apache' was classified as an image, image~source, or loaded template reference.
+
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the container storage, on remote registries, or on the local container engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/leonardo_adiera/do288-apache:latest
+W1004 21:24:10.353544    9987 dockerimagelookup.go:300] container image remote registry lookup failed: you may not have access to the container image "quay.io/leonardo_adiera/do288-apache:latest"
+error:  local file access failed with: stat quay.io/leonardo_adiera/do288-apache:latest: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "quay.io/leonardo_adiera/do288-apache:latest"
+
+Argument 'quay.io/leonardo_adiera/do288-apache:latest' was classified as an image, image~source, or loaded template reference.
+
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the container storage, on remote registries, or on the local container engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
+[student@workstation DO288-apps]$ podman images
+REPOSITORY                            TAG         IMAGE ID      CREATED        SIZE
+localhost/do288-apache                latest      067e99fc9e56  7 minutes ago  236 MB
+quay.io/leonardo_adiera/do288-apache  latest      067e99fc9e56  7 minutes ago  236 MB
+quay.io/redhattraining/httpd-parent   latest      4346d3cace25  3 years ago    236 MB
+[student@workstation DO288-apps]$ podman login quay.io -u ${RHT_OCP4_QUAY_USER}
+Password: 
+Login Succeeded!
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/leonardo_adiera/do288-apache
+W1004 21:26:34.756160   10051 dockerimagelookup.go:300] container image remote registry lookup failed: you may not have access to the container image "quay.io/leonardo_adiera/do288-apache:latest"
+error:  local file access failed with: stat quay.io/leonardo_adiera/do288-apache: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "quay.io/leonardo_adiera/do288-apache"
+
+Argument 'quay.io/leonardo_adiera/do288-apache' was classified as an image, image~source, or loaded template reference.
+
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the container storage, on remote registries, or on the local container engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
+[student@workstation DO288-apps]$ podman pull quay.io/leonardo_adiera/do288-apache
+Trying to pull quay.io/leonardo_adiera/do288-apache:latest...
+Getting image source signatures
+Copying blob 08b8c9fdec44 skipped: already exists  
+Copying blob 6a5240d60dc4 skipped: already exists  
+Copying blob 787f47dbeaac skipped: already exists  
+Copying blob 408208567b9a skipped: already exists  
+Copying blob a3ed95caeb02 done  
+Copying blob a3ed95caeb02 done  
+Copying blob a3ed95caeb02 done  
+Copying blob a3ed95caeb02 done  
+Copying blob a3ed95caeb02 done  
+Copying blob a3ed95caeb02 done  
+Copying blob 114fbcaabdc7 skipped: already exists  
+Writing manifest to image destination
+Storing signatures
+aef13d0a45ff9986c53705ee9cc42b91abb78bfdec5efa4912fdf9293c87cbd8
+[student@workstation DO288-apps]$ podman images
+REPOSITORY                            TAG         IMAGE ID      CREATED         SIZE
+localhost/do288-apache                latest      067e99fc9e56  11 minutes ago  236 MB
+quay.io/leonardo_adiera/do288-apache  latest      aef13d0a45ff  11 minutes ago  236 MB
+quay.io/redhattraining/httpd-parent   latest      4346d3cace25  3 years ago     236 MB
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/leonardo_adiera/do288-apache
+W1004 21:27:38.082695   10100 dockerimagelookup.go:300] container image remote registry lookup failed: you may not have access to the container image "quay.io/leonardo_adiera/do288-apache:latest"
+error:  local file access failed with: stat quay.io/leonardo_adiera/do288-apache: no such file or directory
+error: unable to locate any images in image streams, templates loaded in accessible projects, template files, local docker images with name "quay.io/leonardo_adiera/do288-apache"
+
+Argument 'quay.io/leonardo_adiera/do288-apache' was classified as an image, image~source, or loaded template reference.
+
+The 'oc new-app' command will match arguments to the following types:
+
+  1. Images tagged into image streams in the current project or the 'openshift' project
+     - if you don't specify a tag, we'll add ':latest'
+  2. Images in the container storage, on remote registries, or on the local container engine
+  3. Templates in the current project or the 'openshift' project
+  4. Git repository URLs or local paths that point to Git repositories
+
+--allow-missing-images can be used to point to an image that does not exist yet.
+
+See 'oc new-app -h' for examples.
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/leonardo_adiera/do288-apache
+--> Found container image 66e1fa9 (13 minutes old) from quay.io for "quay.io/leonardo_adiera/do288-apache"
+
+    Red Hat Universal Base Image 8 
+    ------------------------------ 
+    The Universal Base Image is designed and engineered to be the base layer for all of your containerized applications, middleware and utilities. This base image is freely redistributable, but Red Hat only supports Red Hat technologies through subscriptions for Red Hat products. This image is maintained by Red Hat and updated regularly.
+
+    Tags: base rhel8
+
+    * An image stream tag will be created as "hola:latest" that will track this image
+
+--> Creating resources ...
+    imagestream.image.openshift.io "hola" created
+    deployment.apps "hola" created
+    service "hola" created
+--> Success
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/hola' 
+    Run 'oc status' to view your app.
+[student@workstation DO288-apps]$ oc get pods
+NAME                    READY   STATUS             RESTARTS      AGE
+hola-7d846bf4fb-8xnxs   0/1     CrashLoopBackOff   2 (17s ago)   40s
+[student@workstation DO288-apps]$ oc logs hola-7d846bf4fb-8xnxs
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.8.0.103. Set the 'ServerName' directive globally to suppress this message
+(13)Permission denied: AH00072: make_sock: could not bind to address [::]:80
+(13)Permission denied: AH00072: make_sock: could not bind to address 0.0.0.0:80
+no listening sockets available, shutting down
+AH00015: Unable to open logs
+[student@workstation DO288-apps]$ oc delete all -l app=hola
+service "hola" deleted
+deployment.apps "hola" deleted
+imagestream.image.openshift.io "hola" deleted
+[student@workstation DO288-apps]$ nano ~/DO288-apps/container-build/Containerfile
+[student@workstation DO288-apps]$ nano ~/DO288-apps/container-build/Containerfile
+[student@workstation DO288-apps]$ ls .l
+ls: cannot access '.l': No such file or directory
+[student@workstation DO288-apps]$ ls -l
+total 16
+drwxrwxr-x. 2 student student    57 Oct  3 19:15 app-config
+drwxrwxr-x. 9 student student   196 Oct  3 19:15 books
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 build-app
+drwxrwxr-x. 3 student student    38 Oct  3 19:15 container-build
+drwxrwxr-x. 2 student student    20 Oct  3 19:15 go-hello
+drwxrwxr-x. 3 student student    60 Oct  3 19:15 hello-java
+drwxrwxr-x. 2 student student    63 Oct  3 19:15 hello-world-nginx
+drwxrwxr-x. 2 student student    24 Oct  3 19:15 html-helloworld
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 java-serverhost
+-rw-rw-r--. 1 student student 11343 Oct  3 19:15 LICENSE
+drwxrwxr-x. 3 student student    71 Oct  3 19:15 micro-java
+drwxrwxr-x. 3 student student    71 Oct  3 19:15 movies
+drwxrwxr-x. 2 student student    62 Oct  3 19:15 nexus3
+drwxrwxr-x. 2 student student    40 Oct  4 21:10 nodejs-helloworld
+drwxrwxr-x. 2 student student    41 Oct  3 19:15 php-hello-dockerfile
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 php-helloworld
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 php-scale
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 post-commit
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 probes
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 quip
+drwxrwxr-x. 2 student student    38 Oct  3 19:15 quotes
+-rw-rw-r--. 1 student student   205 Oct  3 19:15 README.md
+drwxrwxr-x. 3 student student    36 Oct  3 19:15 s2i-scripts
+drwxrwxr-x. 2 student student    25 Oct  3 19:15 simple-pipeline
+drwxrwxr-x. 3 student student    88 Oct  3 19:15 todo-api
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 todo-api-micro
+drwxrwxr-x. 3 student student   164 Oct  3 19:15 todo-backend
+drwxrwxr-x. 4 student student   195 Oct  3 19:15 todo-frontend
+drwxrwxr-x. 5 student student    85 Oct  3 19:15 todo-single
+drwxrwxr-x. 3 student student   115 Oct  3 19:15 todo-ssr
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 trigger-builds
+drwxrwxr-x. 2 student student    24 Oct  4 18:27 ubi-echo
+drwxrwxr-x. 2 student student    39 Oct  3 19:15 ubi-info
+drwxrwxr-x. 2 student student    24 Oct  3 19:15 ubi-sleep
+[student@workstation DO288-apps]$ cd container-build/
+[student@workstation container-build]$ git commit -a -m "cambiando container file parent"
+[container-build b905d3e] cambiando container file parent
+ Committer: Student User <student@workstation.lab.example.com>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 19 insertions(+)
+[student@workstation container-build]$ git push
+Username for 'https://github.com': leonardotorresochoa
+Password for 'https://leonardotorresochoa@github.com': 
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 743 bytes | 743.00 KiB/s, done.
+Total 4 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/leonardotorresadiera/DO288-apps.git
+   5dcc01b..b905d3e  container-build -> container-build
+[student@workstation container-build]$ podman images
+REPOSITORY                            TAG         IMAGE ID      CREATED         SIZE
+localhost/do288-apache                latest      067e99fc9e56  17 minutes ago  236 MB
+quay.io/leonardo_adiera/do288-apache  latest      aef13d0a45ff  17 minutes ago  236 MB
+quay.io/redhattraining/httpd-parent   latest      4346d3cace25  3 years ago     236 MB
+[student@workstation container-build]$ podman rmi -a --force
+Untagged: quay.io/redhattraining/httpd-parent:latest
+Untagged: localhost/do288-apache:latest
+Untagged: quay.io/leonardo_adiera/do288-apache:latest
+Deleted: 067e99fc9e5623ff4544110e8ed1affaec0febe0f59c47f9fd113e54356aabd4
+Deleted: aef13d0a45ff9986c53705ee9cc42b91abb78bfdec5efa4912fdf9293c87cbd8
+[student@workstation container-build]$ podman images
+REPOSITORY  TAG         IMAGE ID    CREATED     SIZE
+[student@workstation container-build]$ cd ..
+[student@workstation DO288-apps]$ ls -l
+total 16
+drwxrwxr-x. 2 student student    57 Oct  3 19:15 app-config
+drwxrwxr-x. 9 student student   196 Oct  3 19:15 books
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 build-app
+drwxrwxr-x. 3 student student    38 Oct  3 19:15 container-build
+drwxrwxr-x. 2 student student    20 Oct  3 19:15 go-hello
+drwxrwxr-x. 3 student student    60 Oct  3 19:15 hello-java
+drwxrwxr-x. 2 student student    63 Oct  3 19:15 hello-world-nginx
+drwxrwxr-x. 2 student student    24 Oct  3 19:15 html-helloworld
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 java-serverhost
+-rw-rw-r--. 1 student student 11343 Oct  3 19:15 LICENSE
+drwxrwxr-x. 3 student student    71 Oct  3 19:15 micro-java
+drwxrwxr-x. 3 student student    71 Oct  3 19:15 movies
+drwxrwxr-x. 2 student student    62 Oct  3 19:15 nexus3
+drwxrwxr-x. 2 student student    40 Oct  4 21:10 nodejs-helloworld
+drwxrwxr-x. 2 student student    41 Oct  3 19:15 php-hello-dockerfile
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 php-helloworld
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 php-scale
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 post-commit
+drwxrwxr-x. 2 student student    40 Oct  3 19:15 probes
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 quip
+drwxrwxr-x. 2 student student    38 Oct  3 19:15 quotes
+-rw-rw-r--. 1 student student   205 Oct  3 19:15 README.md
+drwxrwxr-x. 3 student student    36 Oct  3 19:15 s2i-scripts
+drwxrwxr-x. 2 student student    25 Oct  3 19:15 simple-pipeline
+drwxrwxr-x. 3 student student    88 Oct  3 19:15 todo-api
+drwxrwxr-x. 3 student student    32 Oct  3 19:15 todo-api-micro
+drwxrwxr-x. 3 student student   164 Oct  3 19:15 todo-backend
+drwxrwxr-x. 4 student student   195 Oct  3 19:15 todo-frontend
+drwxrwxr-x. 5 student student    85 Oct  3 19:15 todo-single
+drwxrwxr-x. 3 student student   115 Oct  3 19:15 todo-ssr
+drwxrwxr-x. 2 student student    23 Oct  3 19:15 trigger-builds
+drwxrwxr-x. 2 student student    24 Oct  4 18:27 ubi-echo
+drwxrwxr-x. 2 student student    39 Oct  3 19:15 ubi-info
+drwxrwxr-x. 2 student student    24 Oct  3 19:15 ubi-sleep
+[student@workstation DO288-apps]$ podman build --layers=false -t do288-apache ./container-build
+STEP 1/6: FROM quay.io/redhattraining/httpd-parent
+Trying to pull quay.io/redhattraining/httpd-parent:latest...
+Getting image source signatures
+Copying blob a3ed95caeb02 done  
+Copying blob a3ed95caeb02 done  
+Copying blob 08b8c9fdec44 done  
+Copying blob 787f47dbeaac done  
+Copying blob a3ed95caeb02 done  
+Copying blob 6a5240d60dc4 done  
+Copying blob a3ed95caeb02 skipped: already exists  
+Copying blob a3ed95caeb02 skipped: already exists  
+Copying blob a3ed95caeb02 skipped: already exists  
+Copying blob 408208567b9a done  
+Writing manifest to image destination
+Storing signatures
+STEP 2/7: COPY src/ ${DOCROOT}/
+STEP 3/7: EXPOSE 8080
+STEP 4/7: LABEL io.k8s.description="A basic Apache HTTP Server child image, uses ONBUILD"       io.k8s.display-name="Apache HTTP Server"       io.openshift.expose-services="8080:http"       io.openshift.tags="apache, httpd"
+STEP 5/7: RUN sed -i "s/Listen 80/Listen 8080/g" /etc/httpd/conf/httpd.conf
+STEP 6/7: RUN chgrp -R 0 /var/log/httpd /var/run/httpd &&     chmod -R g=u /var/log/httpd /var/run/httpd
+STEP 7/7: USER 1001
+COMMIT do288-apache
+Getting image source signatures
+Copying blob 24d85c895b6b skipped: already exists  
+Copying blob c613b100be16 skipped: already exists  
+Copying blob 574bcc187eda skipped: already exists  
+Copying blob 7f9108fde4a1 skipped: already exists  
+Copying blob 2508bf6fe29e done  
+Copying config c2608f345c done  
+Writing manifest to image destination
+Storing signatures
+--> c2608f345c4
+Successfully tagged localhost/do288-apache:latest
+c2608f345c43b1d0f6646aaec5c218d2b4ea7e176094f42a9ac80cf4271de7fe
+[student@workstation DO288-apps]$ podman tag do288-apache quay.io/${RHT_OCP4_QUAY_USER}/do288-apache
+[student@workstation DO288-apps]$ podman push --format v2s1 quay.io/${RHT_OCP4_QUAY_USER}/do288-apache
+Getting image source signatures
+Copying blob 2508bf6fe29e done  
+Copying blob c613b100be16 skipped: already exists  
+Copying blob 574bcc187eda skipped: already exists  
+Copying blob 7f9108fde4a1 skipped: already exists  
+Copying blob 24d85c895b6b skipped: already exists  
+Writing manifest to image destination
+Storing signatures
+[student@workstation DO288-apps]$ oc new-app --name hola quay.io/leonardo_adiera/do288-apache
+--> Found container image 823b357 (About a minute old) from quay.io for "quay.io/leonardo_adiera/do288-apache"
+
+    Apache HTTP Server 
+    ------------------ 
+    A basic Apache HTTP Server child image, uses ONBUILD
+
+    Tags: apache,  httpd
+
+    * An image stream tag will be created as "hola:latest" that will track this image
+
+--> Creating resources ...
+    imagestream.image.openshift.io "hola" created
+    deployment.apps "hola" created
+    service "hola" created
+--> Success
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/hola' 
+    Run 'oc status' to view your app.
+[student@workstation DO288-apps]$ oc get pods
+NAME                    READY   STATUS    RESTARTS   AGE
+hola-68997fcf86-2km2h   1/1     Running   0          6s
+[student@workstation DO288-apps]$ oc expose --port='8080' svc/hola
+route.route.openshift.io/hola exposed
+[student@workstation DO288-apps]$ oc get route
+NAME   HOST/PORT                                              PATH   SERVICES   PORT   TERMINATION   WILDCARD
+hola   hola-developer-container-build.apps.ocp4.example.com          hola       8080                 None
+[student@workstation DO288-apps]$ curl http://hola-${RHT_OCP4_DEV_USER}-container-build.${RHT_OCP4_WILDCARD_DOMAIN} 
+<!DOCTYPE html>
+<html>
+<body>
+  Hello from the Apache child container!
+</body>
+</html>
+[student@workstation DO288-apps]$ cd ..
+[student@workstation ~]$ ls -l
+total 116
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Desktop
+drwxr-xr-x.  4 student student    35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student  4096 Oct  4 21:10 DO288-apps
+-rw-rw-r--.  1 student student  4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+-rw-rw-r--.  1 student student  1628 Oct  4 19:16 DO288-lab-solutions-source-build.zip
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student     6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student   193 Sep 16 14:49 grading_master
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student 71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+-rw-r--r--.  1 student student 25177 Oct  4 19:17 terminal-lab-source-build-04oct22.txt
+drwxr-xr-x.  2 student student     6 Aug 30 11:18 Videos
+[student@workstation ~]$ 
+
