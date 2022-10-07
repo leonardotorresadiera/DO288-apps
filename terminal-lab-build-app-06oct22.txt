@@ -1,0 +1,395 @@
+[student@workstation ~]$ lab build-app start
+
+Checking prerequisites for Lab: Building applications
+
+ Verify the OpenShift cluster is running:
+ · Router pods are available...................................  SUCCESS
+ · OAuth pods are available....................................  SUCCESS
+ · API pods are available......................................  SUCCESS
+ · No cluster operators are progressing........................  SUCCESS
+ · Control plane node 'master01' is ready......................  SUCCESS
+ Checking required artifacts:
+ · Module 'nodejs' exists in classroom's Nexus.................  SUCCESS
+ · Project 'build-app' exists in student's GitHub fork.........  SUCCESS
+ Checking for conflicts with existing OpenShift projects:
+ · Project 'developer-build-app' is absent.....................  SUCCESS
+
+Setting up the classroom for Lab: Building applications
+
+ · Download exercise files.....................................  SUCCESS
+
+Overall start status...........................................  SUCCESS
+
+[student@workstation ~]$ source /usr/local/etc/ocp4.config
+[student@workstation ~]$ cat /usr/local/etc/ocp4.config
+RHT_OCP4_MASTER_API=https://api.ocp4.example.com:6443/
+RHT_OCP4_WILDCARD_DOMAIN=apps.ocp4.example.com
+RHT_OCP4_NEXUS_SERVER=nexus-common.apps.na410.prod.nextcle.com
+RHT_OCP4_MYSQL_SERVER=mysql.ocp-na46a.prod.ole.redhat.com
+RHT_OCP4_DEV_USER=developer
+RHT_OCP4_DEV_PASSWORD=developer
+RHT_OCP4_GITHUB_USER=leonardotorresadiera
+RHT_OCP4_QUAY_USER=leonardo_adiera
+[student@workstation ~]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+Login successful.
+
+You have one project on this server: "developer-trigger-builds"
+
+Using project "developer-trigger-builds".
+[student@workstation ~]$ oc new-project developer-build-app
+Now using project "developer-build-app" on server "https://api.ocp4.example.com:6443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app rails-postgresql-example
+
+to build a new example application in Ruby. Or use kubectl to deploy a simple Kubernetes application:
+
+    kubectl create deployment hello-node --image=k8s.gcr.io/e2e-test-images/agnhost:2.33 -- /agnhost serve-hostname
+
+[student@workstation ~]$ cat ~/DO288/labs/build-app/oc-new-app.sh
+#!/bin/bash
+
+source /usr/local/etc/ocp4.config
+
+oc new-app --name simple --build-env \
+    npm_config_registry=http://invalid-server:8081/repository/nodejs \
+    https://github.com/${RHT_OCP4_GITHUB_USER}/DO288-apps \
+    --context-dir build-app
+
+[student@workstation ~]$ ~/DO288/labs/build-app/oc-new-app.sh
+--> Found image 2575b6e (2 months old) in image stream "openshift/nodejs" under tag "16-ubi8" for "nodejs"
+
+    Node.js 16 
+    ---------- 
+    Node.js 16 available as container is a base platform for building and running various Node.js 16 applications and frameworks. Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications. Node.js uses an event-driven, non-blocking I/O model that makes it lightweight and efficient, perfect for data-intensive real-time applications that run across distributed devices.
+
+    Tags: builder, nodejs, nodejs16
+
+    * The source repository appears to match: nodejs
+    * A source build using source code from https://github.com/leonardotorresadiera/DO288-apps will be created
+      * The resulting image will be pushed to image stream tag "simple:latest"
+      * Use 'oc start-build' to trigger a new build
+
+--> Creating resources ...
+    imagestream.image.openshift.io "simple" created
+    buildconfig.build.openshift.io "simple" created
+    deployment.apps "simple" created
+    service "simple" created
+--> Success
+    Build scheduled, use 'oc logs -f buildconfig/simple' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/simple' 
+    Run 'oc status' to view your app.
+[student@workstation ~]$ oc logs -f bc/simple
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b (post-commit)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Thu Oct 6 21:41:40 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-07T01:45:17Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1007 01:45:17.240974       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44...
+Getting image source signatures
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying blob sha256:9e7b36274d543f81ea98d46e10740d693cd7f021f2b4975e320245d18869dd7d
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying config sha256:2575b6e83cfd2cb36a913eb17dec1d66bbdb629f4001c32d191213d102b5e575
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+STEP 2/9: LABEL "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="build-app"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44"       "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Thu Oct 6 21:41:40 2022 -0400"       "io.openshift.build.commit.id"="22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b"       "io.openshift.build.commit.ref"="main"       "io.openshift.build.commit.message"="post-commit"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="simple-1"     OPENSHIFT_BUILD_NAMESPACE="developer-build-app"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b"     npm_config_registry="http://invalid-server:8081/repository/nodejs"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source ...
+---> Installing all dependencies
+error: unexpected EOF
+[student@workstation ~]$ oc set env bc simple --list
+# buildconfigs/simple
+npm_config_registry=http://invalid-server:8081/repository/nodejs
+[student@workstation ~]$ oc set env bc simple npm_config_registry=http://${RHT_OCP4_NEXUS_SERVER}/repository/nodejs
+buildconfig.build.openshift.io/simple updated
+[student@workstation ~]$ oc set env bc simple --list
+# buildconfigs/simple
+npm_config_registry=http://nexus-common.apps.na410.prod.nextcle.com/repository/nodejs
+[student@workstation ~]$ oc logs -f bc/simple
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b (post-commit)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Thu Oct 6 21:41:40 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-07T01:45:17Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1007 01:45:17.240974       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44...
+Getting image source signatures
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying blob sha256:9e7b36274d543f81ea98d46e10740d693cd7f021f2b4975e320245d18869dd7d
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying config sha256:2575b6e83cfd2cb36a913eb17dec1d66bbdb629f4001c32d191213d102b5e575
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+STEP 2/9: LABEL "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="build-app"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44"       "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Thu Oct 6 21:41:40 2022 -0400"       "io.openshift.build.commit.id"="22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b"       "io.openshift.build.commit.ref"="main"       "io.openshift.build.commit.message"="post-commit"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="simple-1"     OPENSHIFT_BUILD_NAMESPACE="developer-build-app"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b"     npm_config_registry="http://invalid-server:8081/repository/nodejs"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source ...
+---> Installing all dependencies
+npm ERR! code ENOTFOUND
+npm ERR! syscall getaddrinfo
+npm ERR! errno ENOTFOUND
+npm ERR! network request to http://invalid-server:8081/repository/nodejs/express failed, reason: getaddrinfo ENOTFOUND invalid-server
+npm ERR! network This is a problem related to network connectivity.
+npm ERR! network In most cases you are behind a proxy or have bad network settings.
+npm ERR! network 
+npm ERR! network If you are behind a proxy, please make sure that the
+npm ERR! network 'proxy' config is set properly.  See: 'npm help config'
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     /opt/app-root/src/.npm/_logs/2022-10-07T01_45_31_955Z-debug-0.log
+error: build error: error building at STEP "RUN /usr/libexec/s2i/assemble": error while running runtime: exit status 1
+[student@workstation ~]$ oc set env bc simple --list
+# buildconfigs/simple
+npm_config_registry=http://nexus-common.apps.na410.prod.nextcle.com/repository/nodejs
+[student@workstation ~]$ oc expose svc simple
+route.route.openshift.io/simple exposed
+[student@workstation ~]$ oc get route
+NAME     HOST/PORT                                          PATH   SERVICES   PORT       TERMINATION   WILDCARD
+simple   simple-developer-build-app.apps.ocp4.example.com          simple     8080-tcp                 None
+[student@workstation ~]$ 
+[student@workstation ~]$ oc start-build simple
+build.build.openshift.io/simple-2 started
+[student@workstation ~]$ oc get pods
+NAME             READY   STATUS     RESTARTS   AGE
+simple-1-build   0/1     Error      0          3m46s
+simple-2-build   0/1     Init:0/2   0          5s
+[student@workstation ~]$ oc get pods
+NAME             READY   STATUS     RESTARTS   AGE
+simple-1-build   0/1     Error      0          3m48s
+simple-2-build   0/1     Init:0/2   0          7s
+[student@workstation ~]$ oc get pods
+NAME             READY   STATUS     RESTARTS   AGE
+simple-1-build   0/1     Error      0          3m50s
+simple-2-build   0/1     Init:0/2   0          9s
+[student@workstation ~]$ oc get pods
+NAME             READY   STATUS     RESTARTS   AGE
+simple-1-build   0/1     Error      0          3m51s
+simple-2-build   0/1     Init:1/2   0          10s
+[student@workstation ~]$ oc get pods
+NAME             READY   STATUS    RESTARTS   AGE
+simple-1-build   0/1     Error     0          4m
+simple-2-build   1/1     Running   0          19s
+[student@workstation ~]$ oc get pods
+NAME             READY   STATUS    RESTARTS   AGE
+simple-1-build   0/1     Error     0          4m1s
+simple-2-build   1/1     Running   0          20s
+[student@workstation ~]$ oc get route
+NAME     HOST/PORT                                          PATH   SERVICES   PORT       TERMINATION   WILDCARD
+simple   simple-developer-build-app.apps.ocp4.example.com          simple     8080-tcp                 None
+[student@workstation ~]$ curl simple-developer-build-app.apps.ocp4.example.com
+Simple app for the Building Applications Lab!
+[student@workstation ~]$ 
+[student@workstation ~]$ oc describe bc simple
+Name:		simple
+Namespace:	developer-build-app
+Created:	4 minutes ago
+Labels:		app=simple
+		app.kubernetes.io/component=simple
+		app.kubernetes.io/instance=simple
+Annotations:	openshift.io/generated-by=OpenShiftNewApp
+Latest Version:	2
+
+Strategy:	Source
+URL:		https://github.com/leonardotorresadiera/DO288-apps
+ContextDir:	build-app
+From Image:	ImageStreamTag openshift/nodejs:16-ubi8
+Volumes:	<none>
+Output to:	ImageStreamTag simple:latest
+
+Build Run Policy:	Serial
+Triggered by:		Config, ImageChange
+Webhook GitHub:
+	URL:	https://api.ocp4.example.com:6443/apis/build.openshift.io/v1/namespaces/developer-build-app/buildconfigs/simple/webhooks/<secret>/github
+Webhook Generic:
+	URL:		https://api.ocp4.example.com:6443/apis/build.openshift.io/v1/namespaces/developer-build-app/buildconfigs/simple/webhooks/<secret>/generic
+	AllowEnv:	false
+Builds History Limit:
+	Successful:	5
+	Failed:		5
+
+Build		Status		Duration	Creation Time
+simple-2 	complete 	33s 		2022-10-06 21:48:42 -0400 EDT
+simple-1 	failed 		1m41s 		2022-10-06 21:45:01 -0400 EDT
+
+Events:	<none>
+[student@workstation ~]$ SECRET=$(oc get bc simple -o jsonpath="{.spec.triggers[*].generic.secret}{'\n'}")
+[student@workstation ~]$ curl -X POST -k ${RHT_OCP4_MASTER_API}\ apis/build.openshift.io/v1/namespaces/${RHT_OCP4_DEV_USER}-build-app/buildconfigs/simple/webhooks/$SECRET/generic
+{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {},
+  "status": "Failure",
+  "message": "forbidden: User \"system:anonymous\" cannot post path \"/ apis/build.openshift.io/v1/namespaces/developer-build-app/buildconfigs/simple/webhooks/Yi97BFV4OjFdh3Kj-T9r/generic\"",
+  "reason": "Forbidden",
+  "details": {},
+  "code": 403
+}[student@workstation ~]$ curl -X POST -k ${RHT_OCP4_MASTER_API}apis/build.openshift.io/v1/namespaces/${RHT_OCP4_DEV_USER}-build-app/buildconfigs/simple/webhooks/$SECRET/generic
+{"kind":"Build","apiVersion":"build.openshift.io/v1","metadata":{"name":"simple-3","namespace":"developer-build-app","uid":"c4d5a8fa-28ed-4d12-9bc5-ba6f925c1653","resourceVersion":"850433","generation":1,"creationTimestamp":"2022-10-07T01:50:56Z","labels":{"app":"simple","app.kubernetes.io/component":"simple","app.kubernetes.io/instance":"simple","buildconfig":"simple","openshift.io/build-config.name":"simple","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"simple","openshift.io/build.number":"3"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"simple","uid":"3b4fb448-aa5f-4440-95cd-2b3c10a2752d","controller":true}],"managedFields":[{"manager":"Go-http-client","operation":"Update","apiVersion":"build.openshift.io/v1","time":"2022-10-07T01:50:56Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:openshift.io/build-config.name":{},"f:openshift.io/build.number":{}},"f:labels":{".":{},"f:app":{},"f:app.kubernetes.io/component":{},"f:app.kubernetes.io/instance":{},"f:buildconfig":{},"f:openshift.io/build-config.name":{},"f:openshift.io/build.start-policy":{}},"f:ownerReferences":{".":{},"k:{\"uid\":\"3b4fb448-aa5f-4440-95cd-2b3c10a2752d\"}":{}}},"f:spec":{"f:output":{"f:to":{}},"f:serviceAccount":{},"f:source":{"f:contextDir":{},"f:git":{".":{},"f:uri":{}},"f:type":{}},"f:strategy":{"f:sourceStrategy":{".":{},"f:env":{},"f:from":{},"f:pullSecret":{}},"f:type":{}},"f:triggeredBy":{}},"f:status":{"f:conditions":{".":{},"k:{\"type\":\"New\"}":{".":{},"f:lastTransitionTime":{},"f:lastUpdateTime":{},"f:status":{},"f:type":{}}},"f:config":{},"f:phase":{}}}}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/leonardotorresadiera/DO288-apps"},"contextDir":"build-app"},"strategy":{"type":"Source","sourceStrategy":{"from":{"kind":"DockerImage","name":"image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44"},"pullSecret":{"name":"builder-dockercfg-4x2xh"},"env":[{"name":"npm_config_registry","value":"http://nexus-common.apps.na410.prod.nextcle.com/repository/nodejs"}]}},"output":{"to":{"kind":"ImageStreamTag","name":"simple:latest"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Generic WebHook","genericWebHook":{"secret":"\u003csecret\u003e"}}]},"status":{"phase":"New","config":{"kind":"BuildConfig","namespace":"developer-build-app","name":"simple"},"output":{},"conditions":[{"type":"New","status":"True","lastUpdateTime":"2022-10-07T01:50:56Z","lastTransitionTime":"2022-10-07T01:50:56Z"}]}}
+{
+  "kind": "Status",
+  "apiVersion": "v1",
+  "metadata": {},
+  "status": "Success",
+  "message": "invalid Content-Type on payload, ignoring payload and continuing with build",
+  "code": 200
+}[student@workstation ~]$ curl -X POST -k ${RHT_OCP4_MASTER_API}/apis/build.openshift.io/v1/namespaces/${RHT_OCP4_DV_USER}-build-app/buildconfigs/simple/webhooks/$SECRET/generic
+404 page not found
+[student@workstation ~]$ oc get builds
+NAME       TYPE     FROM          STATUS                        STARTED         DURATION
+simple-1   Source   Git@22033fa   Failed (GenericBuildFailed)   7 minutes ago   1m41s
+simple-2   Source   Git@22033fa   Complete                      4 minutes ago   33s
+simple-3   Source   Git@22033fa   Complete                      2 minutes ago   40s
+[student@workstation ~]$  oc logs -f bc/simple
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b (post-commit)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Thu Oct 6 21:41:40 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-07T01:51:12Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1007 01:51:12.660108       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44...
+Getting image source signatures
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:9e7b36274d543f81ea98d46e10740d693cd7f021f2b4975e320245d18869dd7d
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying config sha256:2575b6e83cfd2cb36a913eb17dec1d66bbdb629f4001c32d191213d102b5e575
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44
+STEP 2/9: LABEL "io.openshift.build.commit.message"="post-commit"       "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="build-app"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:2c887de42d9d1f4a980e2020e13fbf8d01f236f6bbc3cac534da04d06f70eb44"       "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Thu Oct 6 21:41:40 2022 -0400"       "io.openshift.build.commit.id"="22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b"       "io.openshift.build.commit.ref"="main"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="simple-3"     OPENSHIFT_BUILD_NAMESPACE="developer-build-app"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="22033fa3f4f0d0c2cbce953b0a4e4d96c2c86b4b"     npm_config_registry="http://nexus-common.apps.na410.prod.nextcle.com/repository/nodejs"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source ...
+---> Installing all dependencies
+
+added 43 packages in 2s
+---> Building in production mode
+---> Pruning the development dependencies
+
+up to date in 391ms
+/tmp is not a mountpoint
+---> Cleaning the /tmp/npm-*
+/opt/app-root/src/.npm is not a mountpoint
+---> Cleaning the npm cache /opt/app-root/src/.npm
+STEP 9/9: CMD /usr/libexec/s2i/run
+COMMIT temp.builder.openshift.io/developer-build-app/simple-3:49b17df2
+time="2022-10-07T01:51:30Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:5966005eac8d0b52bf676cd20f1ffb3435fe4d8245a3afadcd27b0b9e07c096b
+Copying blob sha256:9936c6aaa811c2084fe2c1034e24cbecc3d3ac8db8fe987395723b19c678655b
+Copying blob sha256:0ce645f59bfcd24ff75234e6567b6945cb9fd16fe18082485924d6db10d53326
+Copying blob sha256:4bcf486c55ce7cf7c23ff25b8795fac98c0f640f6d3f705bedd919b41a157cff
+Copying blob sha256:844c2da1c2261a59ea97524c687aab6fe93114c33e3541ca49e74858dfbc94a7
+Copying config sha256:807790b0ed27f1a3244af6be257a0bfb3cb3fb0556ced124caf7ac8f18da4c34
+Writing manifest to image destination
+Storing signatures
+--> 807790b0ed2
+Successfully tagged temp.builder.openshift.io/developer-build-app/simple-3:49b17df2
+807790b0ed27f1a3244af6be257a0bfb3cb3fb0556ced124caf7ac8f18da4c34
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-build-app/simple:latest ...
+Getting image source signatures
+Copying blob sha256:7e3624512448126fd29504b9af9bc034538918c54f0988fb08c03ff7a3a9a4cb
+Copying blob sha256:db0f4cd412505c5cc2f31cf3c65db80f84d8656c4bfa9ef627a6f532c0459fc4
+Copying blob sha256:9e7b36274d543f81ea98d46e10740d693cd7f021f2b4975e320245d18869dd7d
+Copying blob sha256:354c079828fae509c4f8e4ccb59199d275f17b0f26b1d7223fd64733788edf32
+Copying blob sha256:844c2da1c2261a59ea97524c687aab6fe93114c33e3541ca49e74858dfbc94a7
+Copying config sha256:807790b0ed27f1a3244af6be257a0bfb3cb3fb0556ced124caf7ac8f18da4c34
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-build-app/simple@sha256:98ff1513904c965ec8697198ff8f615b964a884719a7db1fd36d30e31acf449d
+Push successful
+[student@workstation ~]$ oc get pods
+NAME                      READY   STATUS      RESTARTS   AGE
+simple-1-build            0/1     Error       0          8m12s
+simple-2-build            0/1     Completed   0          4m31s
+simple-3-build            0/1     Completed   0          2m17s
+simple-86446bd5d6-nbt9c   1/1     Running     0          100s
+[student@workstation ~]$ oc delete project ${RHT_OCP4_DEV_USER}-build-app
+project.project.openshift.io "developer-build-app" deleted
+[student@workstation ~]$ ls -l
+total 152480
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Desktop
+-rw-rw-r--.  1 student student 85020994 Oct  6 18:22 DO2088-labsolutions-expose-image-06.zip
+drwxr-xr-x.  4 student student       35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student     4096 Oct  6 21:41 DO288-apps
+-rw-rw-r--.  1 student student     1749 Oct  5 18:46 DO288-labsolutions-app-config.zip
+-rw-rw-r--.  1 student student     4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+-rw-rw-r--.  1 student student     2297 Oct  4 21:39 DO288-labsolutions-container-build.zip
+-rw-rw-r--.  1 student student     1865 Oct  5 19:10 DO288-labsolutions-design-container.zip
+-rw-rw-r--.  1 student student 70190266 Oct  5 20:36 DO288-labsolutions-external-registry.zip
+-rw-rw-r--.  1 student student     2851 Oct  6 21:39 DO288-labsolutions-postcommit.zip
+-rw-rw-r--.  1 student student     1628 Oct  4 19:16 DO288-lab-solutions-source-build.zip
+-rw-rw-r--.  1 student student     1859 Oct  6 21:17 DO288-labsolutions-trigger-builds.zip
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student        6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student      193 Sep 16 14:49 grading_master
+-rw-rw-r--.  1 student student     4988 Oct  5 21:29 images-is.txt
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student    24078 Oct  5 18:46 terminal-lab-app-config-05oct22.txt
+-rw-r--r--.  1 student student    71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+-rw-r--r--.  1 student student    35344 Oct  4 21:38 terminal-lab-container-build-04oct22.txt
+-rw-r--r--.  1 student student    42059 Oct  5 19:11 terminal-lab-design-container-05oct22.txt
+-rw-r--r--.  1 student student    80745 Oct  6 18:23 terminal-lab-expose-image-06oct22.txt
+-rw-r--r--.  1 student student     8534 Oct  5 21:16 terminal-lab-expose-registry-05oct22.txt
+-rw-r--r--.  1 student student    17264 Oct  5 20:37 terminal-lab-external-registry-05oct22.txt
+-rw-r--r--.  1 student student    22629 Oct  5 22:02 terminal-lab-image-stream-05oct22.txt
+-rw-r--r--.  1 student student   496726 Oct  6 19:56 terminal-lab-manage-builds-06oct22.txt
+-rw-r--r--.  1 student student    25177 Oct  4 19:17 terminal-lab-source-build-04oct22.txt
+-rw-r--r--.  1 student student    28022 Oct  6 20:50 terminal-lab-trigger-builds-06oct22.txt
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Videos
+[student@workstation ~]$ zip -r DO288-labsolutions-buildapp.zip DO288
+  adding: DO288/ (stored 0%)
+  adding: DO288/labs/ (stored 0%)
+  adding: DO288/labs/trigger-builds/ (stored 0%)
+  adding: DO288/labs/trigger-builds/push-original.sh (deflated 18%)
+  adding: DO288/labs/trigger-builds/push-newer.sh (deflated 18%)
+  adding: DO288/labs/trigger-builds/oc-new-app.sh (deflated 14%)
+  adding: DO288/labs/build-app/ (stored 0%)
+  adding: DO288/labs/build-app/oc-new-app.sh (deflated 19%)
+  adding: DO288/solutions/ (stored 0%)
+[student@workstation ~]$ cp DO288-labsolutions-buildapp.zip DO288-apps/
+[student@workstation ~]$ 
+
