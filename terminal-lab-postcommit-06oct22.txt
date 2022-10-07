@@ -1,0 +1,361 @@
+[student@workstation DO288-apps]$ lab post-commit start
+
+Checking prerequisites for GE: Implementing Post-Commit Build Hooks
+
+ Verify the OpenShift cluster is running:
+ · Router pods are available...................................  SUCCESS
+ · OAuth pods are available....................................  SUCCESS
+ · API pods are available......................................  SUCCESS
+ · No cluster operators are progressing........................  SUCCESS
+ · Control plane node 'master01' is ready......................  SUCCESS
+ Checking for conflicts with existing OpenShift projects:
+ · Project 'developer-post-commit' is absent...................  SUCCESS
+
+Setting up the classroom for GE: Implementing Post-Commit Build Hooks
+
+ Prepare the Guided Exercise
+ · Download exercise files.....................................  SUCCESS
+ · Log in on OpenShift.........................................  SUCCESS
+ · Create the developer-post-commit project....................  SUCCESS
+ · Deploy and configure the builds-for-managers application....  SUCCESS
+ · Expose the builds-for-managers application..................  SUCCESS
+
+Overall start status...........................................  SUCCESS
+
+[student@workstation DO288-apps]$ source /usr/local/etc/ocp4.config
+[student@workstation DO288-apps]$ cat /usr/local/etc/ocp4.config
+RHT_OCP4_MASTER_API=https://api.ocp4.example.com:6443/
+RHT_OCP4_WILDCARD_DOMAIN=apps.ocp4.example.com
+RHT_OCP4_NEXUS_SERVER=nexus-common.apps.na410.prod.nextcle.com
+RHT_OCP4_MYSQL_SERVER=mysql.ocp-na46a.prod.ole.redhat.com
+RHT_OCP4_DEV_USER=developer
+RHT_OCP4_DEV_PASSWORD=developer
+RHT_OCP4_GITHUB_USER=leonardotorresadiera
+RHT_OCP4_QUAY_USER=leonardo_adiera
+[student@workstation DO288-apps]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+Login successful.
+
+You have access to the following projects and can switch between them with 'oc project <projectname>':
+
+    developer-post-commit
+  * developer-trigger-builds
+
+Using project "developer-trigger-builds".
+[student@workstation DO288-apps]$ oc project developer-post-commit
+Now using project "developer-post-commit" on server "https://api.ocp4.example.com:6443".
+[student@workstation DO288-apps]$ oc status
+In project developer-post-commit on server https://api.ocp4.example.com:6443
+
+http://builds-for-managers-developer-post-commit.apps.ocp4.example.com to pod port 8080-tcp (svc/builds-for-managers)
+  deployment/builds-for-managers deploys istag/builds-for-managers:latest 
+    deployment #2 running for about a minute - 1 pod
+    deployment #1 deployed about a minute ago
+
+
+1 info identified, use 'oc status --suggest' to see details.
+[student@workstation DO288-apps]$ oc new-app --name hook --context-dir post-commit php:7.3~http://github.com/${RHT_OCP4_GITHUB_USER}/DO288-apps
+warning: Cannot check if git requires authentication.
+--> Found image 4121cf7 (2 months old) in image stream "openshift/php" under tag "7.3" for "php:7.3"
+
+    Apache 2.4 with PHP 7.3 
+    ----------------------- 
+    PHP 7.3 available as container is a base platform for building and running various PHP 7.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+
+    Tags: builder, php, php73, rh-php73
+
+    * A source build using source code from http://github.com/leonardotorresadiera/DO288-apps will be created
+      * The resulting image will be pushed to image stream tag "hook:latest"
+      * Use 'oc start-build' to trigger a new build
+
+--> Creating resources ...
+    imagestream.image.openshift.io "hook" created
+    buildconfig.build.openshift.io "hook" created
+    deployment.apps "hook" created
+    service "hook" created
+--> Success
+    Build scheduled, use 'oc logs -f buildconfig/hook' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/hook' 
+    Run 'oc status' to view your app.
+[student@workstation DO288-apps]$ oc logs -f bc/hook
+Adding cluster TLS certificate authority to trust store
+Cloning "http://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	f86943d70b6328ca2aed4b82be4189e7fcf7bf81 (trigger-builds)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Thu Oct 6 21:30:02 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-07T01:33:42Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1007 01:33:42.051983       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344...
+Getting image source signatures
+Copying blob sha256:1c42cd59ba3e0759f1177deb1ff3e4151c7815d732060c46addb2ba1f37d0fb8
+Copying blob sha256:e5746dd3575a92053f5871f0c54fdc950a16d792b816f1b798e2ebbd4956b793
+Copying blob sha256:78fa487001cb0a670d8de0fd05c8ec49d86089b8f8090d086d9bb2b28f3b4f35
+Copying blob sha256:ad87bf3a5a671cdd7f876034cdcea0a1c794a3f20af269a153fa0ef041e33178
+Copying blob sha256:c6b7517f07270deac08f620fb401d5f4310cc8d79c1ece4f0b4f10cc96575375
+Copying config sha256:4121cf7a66e507513f98bc667788b715b116baa5260e92815928013a79738c66
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344
+STEP 2/9: LABEL "io.openshift.build.source-context-dir"="post-commit"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344"       "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Thu Oct 6 21:30:02 2022 -0400"       "io.openshift.build.commit.id"="f86943d70b6328ca2aed4b82be4189e7fcf7bf81"       "io.openshift.build.commit.ref"="main"       "io.openshift.build.commit.message"="trigger-builds"       "io.openshift.build.source-location"="http://github.com/leonardotorresadiera/DO288-apps"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="hook-1"     OPENSHIFT_BUILD_NAMESPACE="developer-post-commit"     OPENSHIFT_BUILD_SOURCE="http://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="f86943d70b6328ca2aed4b82be4189e7fcf7bf81"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source...
+=> sourcing 20-copy-config.sh ...
+---> 01:33:55     Processing additional arbitrary httpd configuration provided by s2i ...
+=> sourcing 00-documentroot.conf ...
+=> sourcing 50-mpm-tuning.conf ...
+=> sourcing 40-ssl-certs.sh ...
+STEP 9/9: CMD /usr/libexec/s2i/run
+COMMIT temp.builder.openshift.io/developer-post-commit/hook-1:4da161a3
+time="2022-10-07T01:33:55Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:41cab69aa8d272debd178e0f0325f1ce7030679a5b663e63b080e54340b30b12
+Copying blob sha256:ac12b76679f8ff16aa2d518c298d371c4b2795a4a7ab24eb2e031ea1910379f0
+Copying blob sha256:04085daff9fb8f0dfa9576f409e6265541587d4d36ebdb28652ff4778ad5b318
+Copying blob sha256:19f3a3b7dae5e58f2db21343cdea403622a32cf27a68c08af18a10cbe1481410
+Copying blob sha256:cc65b4cdd4402e941800f1c17ad57cb9c12cc78e989c6749146c4af5d30e719a
+Copying blob sha256:00723adc31a60bbb83b27d9f7d445a079cb315da116266ee2cb5da02e2d5e5f8
+Copying config sha256:19a9363379b61fe8b3c19394a8b0a2d350790278bc8f009a14136db93d85e293
+Writing manifest to image destination
+Storing signatures
+--> 19a9363379b
+Successfully tagged temp.builder.openshift.io/developer-post-commit/hook-1:4da161a3
+19a9363379b61fe8b3c19394a8b0a2d350790278bc8f009a14136db93d85e293
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-post-commit/hook:latest ...
+Getting image source signatures
+Copying blob sha256:00723adc31a60bbb83b27d9f7d445a079cb315da116266ee2cb5da02e2d5e5f8
+Copying blob sha256:78fa487001cb0a670d8de0fd05c8ec49d86089b8f8090d086d9bb2b28f3b4f35
+Copying blob sha256:c6b7517f07270deac08f620fb401d5f4310cc8d79c1ece4f0b4f10cc96575375
+Copying blob sha256:ad87bf3a5a671cdd7f876034cdcea0a1c794a3f20af269a153fa0ef041e33178
+Copying blob sha256:e5746dd3575a92053f5871f0c54fdc950a16d792b816f1b798e2ebbd4956b793
+Copying blob sha256:1c42cd59ba3e0759f1177deb1ff3e4151c7815d732060c46addb2ba1f37d0fb8
+Copying config sha256:19a9363379b61fe8b3c19394a8b0a2d350790278bc8f009a14136db93d85e293
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-post-commit/hook@sha256:21882e38905bd77d71fbb0b2977f16dd3f975d042310ffc68e6c652446c1a807
+Push successful
+[student@workstation DO288-apps]$ oc get pods
+NAME                                  READY   STATUS      RESTARTS   AGE
+builds-for-managers-f969b9d55-4d4g8   1/1     Running     0          2m33s
+hook-1-build                          0/1     Completed   0          43s
+hook-684c7cddcd-zwfgx                 1/1     Running     0          11s
+[student@workstation DO288-apps]$ cat ~/DO288/labs/post-commit/create-hook.sh
+#!/bin/bash
+
+source /usr/local/etc/ocp4.config
+oc set build-hook bc/hook --post-commit --command -- \
+    bash -c "\"curl -s -S -i -X POST http://builds-for-managers-${RHT_OCP4_DEV_USER}-post-commit.${RHT_OCP4_WILDCARD_DOMAIN}/api/builds -f -d 'developer=\${DEVELOPER}&git=\${OPENSHIFT_BUILD_SOURCE}&project=\${OPENSHIFT_BUILD_NAMESPACE}'\""
+[student@workstation DO288-apps]$ ~/DO288/labs/post-commit/create-hook.sh
+buildconfig.build.openshift.io/hook hooks updated
+[student@workstation DO288-apps]$ oc describe bc/hook | grep Post
+Post Commit Hook:	["bash", "-c", "\"curl -s -S -i -X POST http://builds-for-managers-developer-post-commit.apps.ocp4.example.com/api/builds -f -d 'developer=${DEVELOPER}&git=${OPENSHIFT_BUILD_SOURCE}&project=${OPENSHIFT_BUILD_NAMESPACE}'\""]
+[student@workstation DO288-apps]$ oc start-build bc/hook -F
+build.build.openshift.io/hook-2 started
+Adding cluster TLS certificate authority to trust store
+Cloning "http://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	f86943d70b6328ca2aed4b82be4189e7fcf7bf81 (trigger-builds)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Thu Oct 6 21:30:02 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-07T01:36:01Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1007 01:36:01.772860       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344...
+Getting image source signatures
+Copying blob sha256:e5746dd3575a92053f5871f0c54fdc950a16d792b816f1b798e2ebbd4956b793
+Copying blob sha256:78fa487001cb0a670d8de0fd05c8ec49d86089b8f8090d086d9bb2b28f3b4f35
+Copying blob sha256:1c42cd59ba3e0759f1177deb1ff3e4151c7815d732060c46addb2ba1f37d0fb8
+Copying blob sha256:c6b7517f07270deac08f620fb401d5f4310cc8d79c1ece4f0b4f10cc96575375
+Copying blob sha256:ad87bf3a5a671cdd7f876034cdcea0a1c794a3f20af269a153fa0ef041e33178
+Copying config sha256:4121cf7a66e507513f98bc667788b715b116baa5260e92815928013a79738c66
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344
+Replaced Dockerfile FROM image image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344
+Adding transient rw bind mount for /run/secrets/rhsm
+[1/3] STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344 AS appimageb31d1a1938734825b06b05da91684e6d
+[1/3] STEP 2/9: LABEL "io.openshift.build.commit.message"="trigger-builds"       "io.openshift.build.source-location"="http://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="post-commit"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344"       "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Thu Oct 6 21:30:02 2022 -0400"       "io.openshift.build.commit.id"="f86943d70b6328ca2aed4b82be4189e7fcf7bf81"       "io.openshift.build.commit.ref"="main"
+[1/3] STEP 3/9: ENV OPENSHIFT_BUILD_NAME="hook-2"     OPENSHIFT_BUILD_NAMESPACE="developer-post-commit"     OPENSHIFT_BUILD_SOURCE="http://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="f86943d70b6328ca2aed4b82be4189e7fcf7bf81"
+[1/3] STEP 4/9: USER root
+[1/3] STEP 5/9: COPY upload/src /tmp/src
+[1/3] STEP 6/9: RUN chown -R 1001:0 /tmp/src
+[1/3] STEP 7/9: USER 1001
+[1/3] STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source...
+=> sourcing 20-copy-config.sh ...
+---> 01:36:14     Processing additional arbitrary httpd configuration provided by s2i ...
+=> sourcing 00-documentroot.conf ...
+=> sourcing 50-mpm-tuning.conf ...
+=> sourcing 40-ssl-certs.sh ...
+[1/3] STEP 9/9: CMD /usr/libexec/s2i/run
+time="2022-10-07T01:36:14Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:41cab69aa8d272debd178e0f0325f1ce7030679a5b663e63b080e54340b30b12
+Copying blob sha256:ac12b76679f8ff16aa2d518c298d371c4b2795a4a7ab24eb2e031ea1910379f0
+Copying blob sha256:04085daff9fb8f0dfa9576f409e6265541587d4d36ebdb28652ff4778ad5b318
+Copying blob sha256:19f3a3b7dae5e58f2db21343cdea403622a32cf27a68c08af18a10cbe1481410
+Copying blob sha256:cc65b4cdd4402e941800f1c17ad57cb9c12cc78e989c6749146c4af5d30e719a
+Copying blob sha256:05a5682ec9886ade0670de72a23c7b8b670fee5d5181649e5922b6f551015558
+Copying config sha256:342e7aed9f07719045f506447a8f0ae1696cf97b8542138b26ca53d2e3cb8fd4
+Writing manifest to image destination
+Storing signatures
+--> 342e7aed9f0
+[2/3] STEP 1/2: FROM 342e7aed9f07719045f506447a8f0ae1696cf97b8542138b26ca53d2e3cb8fd4
+[2/3] STEP 2/2: RUN bash -c "curl -s -S -i -X POST http://builds-for-managers-developer-post-commit.apps.ocp4.example.com/api/builds -f -d 'developer=${DEVELOPER}&git=${OPENSHIFT_BUILD_SOURCE}&project=${OPENSHIFT_BUILD_NAMESPACE}'"
+curl: (22) The requested URL returned error: 400 Bad Request
+[3/3] STEP 1/1: FROM 342e7aed9f07719045f506447a8f0ae1696cf97b8542138b26ca53d2e3cb8fd4
+error: build error: error building at STEP "RUN bash -c "curl -s -S -i -X POST http://builds-for-managers-developer-post-commit.apps.ocp4.example.com/api/builds -f -d 'developer=${DEVELOPER}&git=${OPENSHIFT_BUILD_SOURCE}&project=${OPENSHIFT_BUILD_NAMESPACE}'"": error while running runtime: exit status 22
+[student@workstation DO288-apps]$ oc get builds
+NAME     TYPE     FROM          STATUS                        STARTED          DURATION
+hook-1   Source   Git@f86943d   Complete                      3 minutes ago    35s
+hook-2   Source   Git@f86943d   Failed (GenericBuildFailed)   56 seconds ago   28s
+[student@workstation DO288-apps]$ oc set env bc/hook DEVELOPER="Leonardo Torres"
+buildconfig.build.openshift.io/hook updated
+[student@workstation DO288-apps]$ oc set env bc/hook --list
+# buildconfigs/hook
+DEVELOPER=Leonardo Torres
+[student@workstation DO288-apps]$ oc start-build bc/hook -F
+build.build.openshift.io/hook-3 started
+Adding cluster TLS certificate authority to trust store
+Cloning "http://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	f86943d70b6328ca2aed4b82be4189e7fcf7bf81 (trigger-builds)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Thu Oct 6 21:30:02 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-07T01:37:36Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1007 01:37:36.124542       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344...
+Getting image source signatures
+Copying blob sha256:78fa487001cb0a670d8de0fd05c8ec49d86089b8f8090d086d9bb2b28f3b4f35
+Copying blob sha256:c6b7517f07270deac08f620fb401d5f4310cc8d79c1ece4f0b4f10cc96575375
+Copying blob sha256:1c42cd59ba3e0759f1177deb1ff3e4151c7815d732060c46addb2ba1f37d0fb8
+Copying blob sha256:e5746dd3575a92053f5871f0c54fdc950a16d792b816f1b798e2ebbd4956b793
+Copying blob sha256:ad87bf3a5a671cdd7f876034cdcea0a1c794a3f20af269a153fa0ef041e33178
+Copying config sha256:4121cf7a66e507513f98bc667788b715b116baa5260e92815928013a79738c66
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344
+Replaced Dockerfile FROM image image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344
+Adding transient rw bind mount for /run/secrets/rhsm
+[1/3] STEP 1/9: FROM image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344 AS appimage01260bf4fe574d7b8adfe6687d29b942
+[1/3] STEP 2/9: LABEL "io.openshift.build.commit.ref"="main"       "io.openshift.build.commit.message"="trigger-builds"       "io.openshift.build.source-location"="http://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="post-commit"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/php@sha256:781147f69c77581c683bcbbbba7b56c17c48ef34e5a8732b97e680842bda2344"       "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Thu Oct 6 21:30:02 2022 -0400"       "io.openshift.build.commit.id"="f86943d70b6328ca2aed4b82be4189e7fcf7bf81"
+[1/3] STEP 3/9: ENV OPENSHIFT_BUILD_NAME="hook-3"     OPENSHIFT_BUILD_NAMESPACE="developer-post-commit"     OPENSHIFT_BUILD_SOURCE="http://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="f86943d70b6328ca2aed4b82be4189e7fcf7bf81"     DEVELOPER="Leonardo Torres"
+[1/3] STEP 4/9: USER root
+[1/3] STEP 5/9: COPY upload/src /tmp/src
+[1/3] STEP 6/9: RUN chown -R 1001:0 /tmp/src
+[1/3] STEP 7/9: USER 1001
+[1/3] STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source...
+=> sourcing 20-copy-config.sh ...
+---> 01:37:47     Processing additional arbitrary httpd configuration provided by s2i ...
+=> sourcing 00-documentroot.conf ...
+=> sourcing 50-mpm-tuning.conf ...
+=> sourcing 40-ssl-certs.sh ...
+[1/3] STEP 9/9: CMD /usr/libexec/s2i/run
+time="2022-10-07T01:37:47Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:41cab69aa8d272debd178e0f0325f1ce7030679a5b663e63b080e54340b30b12
+Copying blob sha256:ac12b76679f8ff16aa2d518c298d371c4b2795a4a7ab24eb2e031ea1910379f0
+Copying blob sha256:04085daff9fb8f0dfa9576f409e6265541587d4d36ebdb28652ff4778ad5b318
+Copying blob sha256:19f3a3b7dae5e58f2db21343cdea403622a32cf27a68c08af18a10cbe1481410
+Copying blob sha256:cc65b4cdd4402e941800f1c17ad57cb9c12cc78e989c6749146c4af5d30e719a
+Copying blob sha256:2988b6cb3d2c59a3182bec82d7298165a39bbe8457b08f2dffe4ba0c36a49655
+Copying config sha256:6946bcbdfba41667cd159dfae205f5851045e9997dfdfd9ced7b1bf6e2f46f3e
+Writing manifest to image destination
+Storing signatures
+--> 6946bcbdfba
+[2/3] STEP 1/2: FROM 6946bcbdfba41667cd159dfae205f5851045e9997dfdfd9ced7b1bf6e2f46f3e
+[2/3] STEP 2/2: RUN bash -c "curl -s -S -i -X POST http://builds-for-managers-developer-post-commit.apps.ocp4.example.com/api/builds -f -d 'developer=${DEVELOPER}&git=${OPENSHIFT_BUILD_SOURCE}&project=${OPENSHIFT_BUILD_NAMESPACE}'"
+HTTP/1.1 200 OK
+content-type: application/octet-stream
+content-length: 15
+date: Fri, 07 Oct 2022 01:37:49 GMT
+set-cookie: 9bf95dc4d1ba28115289f03e97e86a81=5d8d0eaff53981ea639d7008a3d296ab; path=/; HttpOnly
+
+Build persisted[3/3] STEP 1/1: FROM 6946bcbdfba41667cd159dfae205f5851045e9997dfdfd9ced7b1bf6e2f46f3e
+[3/3] COMMIT temp.builder.openshift.io/developer-post-commit/hook-3:847ce451
+--> 6946bcbdfba
+Successfully tagged temp.builder.openshift.io/developer-post-commit/hook-3:847ce451
+6946bcbdfba41667cd159dfae205f5851045e9997dfdfd9ced7b1bf6e2f46f3e
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-post-commit/hook:latest ...
+Getting image source signatures
+Copying blob sha256:c6b7517f07270deac08f620fb401d5f4310cc8d79c1ece4f0b4f10cc96575375
+Copying blob sha256:ad87bf3a5a671cdd7f876034cdcea0a1c794a3f20af269a153fa0ef041e33178
+Copying blob sha256:e5746dd3575a92053f5871f0c54fdc950a16d792b816f1b798e2ebbd4956b793
+Copying blob sha256:1c42cd59ba3e0759f1177deb1ff3e4151c7815d732060c46addb2ba1f37d0fb8
+Copying blob sha256:78fa487001cb0a670d8de0fd05c8ec49d86089b8f8090d086d9bb2b28f3b4f35
+Copying blob sha256:2988b6cb3d2c59a3182bec82d7298165a39bbe8457b08f2dffe4ba0c36a49655
+Copying config sha256:6946bcbdfba41667cd159dfae205f5851045e9997dfdfd9ced7b1bf6e2f46f3e
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-post-commit/hook@sha256:a2318481202c1624473f99db3a484235d4e4863b0c15d170cac62767214067f4
+Push successful
+[student@workstation DO288-apps]$ oc get route
+NAME                  HOST/PORT                                                         PATH   SERVICES              PORT       TERMINATION   WILDCARD
+builds-for-managers   builds-for-managers-developer-post-commit.apps.ocp4.example.com          builds-for-managers   8080-tcp                 None
+[student@workstation DO288-apps]$ builds-for-managers-developer-post-commit.apps.ocp4.example.com 
+bash: builds-for-managers-developer-post-commit.apps.ocp4.example.com: command not found...
+[student@workstation DO288-apps]$ git branch
+* main
+[student@workstation DO288-apps]$ cd ..
+[student@workstation ~]$ ls -l
+total 152476
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Desktop
+-rw-rw-r--.  1 student student 85020994 Oct  6 18:22 DO2088-labsolutions-expose-image-06.zip
+drwxr-xr-x.  4 student student       35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student     4096 Oct  6 21:29 DO288-apps
+-rw-rw-r--.  1 student student     1749 Oct  5 18:46 DO288-labsolutions-app-config.zip
+-rw-rw-r--.  1 student student     4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+-rw-rw-r--.  1 student student     2297 Oct  4 21:39 DO288-labsolutions-container-build.zip
+-rw-rw-r--.  1 student student     1865 Oct  5 19:10 DO288-labsolutions-design-container.zip
+-rw-rw-r--.  1 student student 70190266 Oct  5 20:36 DO288-labsolutions-external-registry.zip
+-rw-rw-r--.  1 student student     1628 Oct  4 19:16 DO288-lab-solutions-source-build.zip
+-rw-rw-r--.  1 student student     1859 Oct  6 21:17 DO288-labsolutions-trigger-builds.zip
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student        6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student      193 Sep 16 14:49 grading_master
+-rw-rw-r--.  1 student student     4988 Oct  5 21:29 images-is.txt
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student    24078 Oct  5 18:46 terminal-lab-app-config-05oct22.txt
+-rw-r--r--.  1 student student    71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+-rw-r--r--.  1 student student    35344 Oct  4 21:38 terminal-lab-container-build-04oct22.txt
+-rw-r--r--.  1 student student    42059 Oct  5 19:11 terminal-lab-design-container-05oct22.txt
+-rw-r--r--.  1 student student    80745 Oct  6 18:23 terminal-lab-expose-image-06oct22.txt
+-rw-r--r--.  1 student student     8534 Oct  5 21:16 terminal-lab-expose-registry-05oct22.txt
+-rw-r--r--.  1 student student    17264 Oct  5 20:37 terminal-lab-external-registry-05oct22.txt
+-rw-r--r--.  1 student student    22629 Oct  5 22:02 terminal-lab-image-stream-05oct22.txt
+-rw-r--r--.  1 student student   496726 Oct  6 19:56 terminal-lab-manage-builds-06oct22.txt
+-rw-r--r--.  1 student student    25177 Oct  4 19:17 terminal-lab-source-build-04oct22.txt
+-rw-r--r--.  1 student student    28022 Oct  6 20:50 terminal-lab-trigger-builds-06oct22.txt
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Videos
+[student@workstation ~]$ zip -r DO288-labsolutions-postcommit.zip DO288
+  adding: DO288/ (stored 0%)
+  adding: DO288/labs/ (stored 0%)
+  adding: DO288/labs/trigger-builds/ (stored 0%)
+  adding: DO288/labs/trigger-builds/push-original.sh (deflated 18%)
+  adding: DO288/labs/trigger-builds/push-newer.sh (deflated 18%)
+  adding: DO288/labs/trigger-builds/oc-new-app.sh (deflated 14%)
+  adding: DO288/labs/post-commit/ (stored 0%)
+  adding: DO288/labs/post-commit/create-hook.sh (deflated 27%)
+  adding: DO288/labs/post-commit/oc-new-app.sh (deflated 15%)
+  adding: DO288/solutions/ (stored 0%)
+[student@workstation ~]$ cp DO288-labsolutions-postcommit.zip DO288-apps/
+[student@workstation ~]$ 
+
