@@ -1,0 +1,469 @@
+[student@workstation DO288-apps]$ 
+[student@workstation DO288-apps]$ 
+[student@workstation DO288-apps]$ lab trigger-builds start
+
+Checking prerequisites for GE: Triggering Builds
+
+ Checking local clone of the applications repository:
+ · Folder '/home/student/DO288-apps' is a git repo.............  SUCCESS
+ · Git repo '/home/student/DO288-apps' has no pending changes..  SUCCESS
+ · Project 'trigger-builds' exists in student's GitHub fork....  SUCCESS
+ Verify the OpenShift cluster is running:
+ · Router pods are available...................................  SUCCESS
+ · OAuth pods are available....................................  SUCCESS
+ · API pods are available......................................  SUCCESS
+ · No cluster operators are progressing........................  SUCCESS
+ · Control plane node 'master01' is ready......................  SUCCESS
+ · Check if file 'php-73-ubi8-original.tar.gz' is available....  SUCCESS
+ · Check if file 'php-73-ubi8-newer.tar.gz' is available.......  SUCCESS
+ Checking for conflicts with existing OpenShift projects:
+ · Project 'developer-trigger-builds' is absent................  SUCCESS
+
+Setting up the classroom for GE: Triggering Builds
+
+ Downloading required files:
+ · Download exercise files.....................................  SUCCESS
+ · Download php-73-ubi8-original.tar.gz........................  SUCCESS
+ · Download php-73-ubi8-newer.tar.gz...........................  SUCCESS
+
+Overall start status...........................................  SUCCESS
+
+[student@workstation DO288-apps]$ source /usr/local/etc/ocp4.config
+[student@workstation DO288-apps]$ cat /usr/local/etc/ocp4.config
+RHT_OCP4_MASTER_API=https://api.ocp4.example.com:6443/
+RHT_OCP4_WILDCARD_DOMAIN=apps.ocp4.example.com
+RHT_OCP4_NEXUS_SERVER=nexus-common.apps.na410.prod.nextcle.com
+RHT_OCP4_MYSQL_SERVER=mysql.ocp-na46a.prod.ole.redhat.com
+RHT_OCP4_DEV_USER=developer
+RHT_OCP4_DEV_PASSWORD=developer
+RHT_OCP4_GITHUB_USER=leonardotorresadiera
+RHT_OCP4_QUAY_USER=leonardo_adiera
+[student@workstation DO288-apps]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+Login successful.
+
+You don't have any projects. You can try to create a new project, by running
+
+    oc new-project <projectname>
+
+[student@workstation DO288-apps]$ oc new-projects ${RHT_OCP4_DEV_USER}-trigger-builds
+error: unknown command "new-projects" for "oc"
+
+Did you mean this?
+	new-project
+[student@workstation DO288-apps]$ oc new-project ${RHT_OCP4_DEV_USER}-trigger-builds
+Now using project "developer-trigger-builds" on server "https://api.ocp4.example.com:6443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app rails-postgresql-example
+
+to build a new example application in Ruby. Or use kubectl to deploy a simple Kubernetes application:
+
+    kubectl create deployment hello-node --image=k8s.gcr.io/e2e-test-images/agnhost:2.33 -- /agnhost serve-hostname
+
+[student@workstation DO288-apps]$ podman login -u ${RHT_OCP4_QUAY_USER} quay.io
+Password: 
+Login Succeeded!
+[student@workstation DO288-apps]$ cd /home/student/DO288/labs/trigger-builds
+[student@workstation trigger-builds]$ ls -l
+total 561908
+-rwxrwxr-x. 1 student student       172 Sep 15 13:10 oc-new-app.sh
+-rw-r--r--. 1 student student 293272064 Oct  6 20:26 php-73-ubi8-newer.tar.gz
+-rw-r--r--. 1 student student 282104832 Oct  6 20:26 php-73-ubi8-original.tar.gz
+-rwxrwxr-x. 1 student student       264 Sep 15 13:10 push-newer.sh
+-rwxrwxr-x. 1 student student       267 Sep 15 13:10 push-original.sh
+[student@workstation trigger-builds]$ skopeo copy --format v2s1 oci-archivephp-73-ubi8-original.tar.gz docker://quay.io/${RHT_OCP4_QUAY_USER}/php-73-ubi8:latest
+FATA[0000] Invalid source name oci-archivephp-73-ubi8-original.tar.gz: Invalid image name "oci-archivephp-73-ubi8-original.tar.gz", expected colon-separated transport:reference 
+[student@workstation trigger-builds]$ skopeo copy --format v2s1 oci-archive:php-73-ubi8-original.tar.gz docker://quay.io/${RHT_OCP4_QUAY_USER}/php-73-ubi8:latest
+Getting image source signatures
+Copying blob ca4d32f962e4 done  
+Copying blob 1a1a2275d055 done  
+Copying blob 3625e39282d6 done  
+Copying blob b8f1751bd039 done  
+Copying blob 559f601f59e0 done  
+Writing manifest to image destination
+Storing signatures
+[student@workstation trigger-builds]$ oc create secret generic quay-registry --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json --type kubernetes.io/dockerconfigjson
+secret/quay-registry created
+[student@workstation trigger-builds]$ oc secrets link builder quay-registry
+[student@workstation trigger-builds]$ oc import-image php --from quay.io/${RHT_OCP4_QUAY_USER}/php-73-ubi8 --confirm
+imagestream.image.openshift.io/php imported
+
+Name:			php
+Namespace:		developer-trigger-builds
+Created:		Less than a second ago
+Labels:			<none>
+Annotations:		openshift.io/image.dockerRepositoryCheck=2022-10-07T00:31:51Z
+Image Repository:	default-route-openshift-image-registry.apps.ocp4.example.com/developer-trigger-builds/php
+Image Lookup:		local=false
+Unique Images:		1
+Tags:			1
+
+latest
+  tagged from quay.io/leonardo_adiera/php-73-ubi8
+
+  * quay.io/leonardo_adiera/php-73-ubi8@sha256:8b66bdc7e6fe747cb01bbff46f22df7dd1ee4a1bb312b7a0ba13752a70dbd11b
+      Less than a second ago
+
+Image Name:	php:latest
+Docker Image:	quay.io/leonardo_adiera/php-73-ubi8@sha256:8b66bdc7e6fe747cb01bbff46f22df7dd1ee4a1bb312b7a0ba13752a70dbd11b
+Name:		sha256:8b66bdc7e6fe747cb01bbff46f22df7dd1ee4a1bb312b7a0ba13752a70dbd11b
+Created:	Less than a second ago
+Annotations:	image.openshift.io/dockerLayersOrder=ascending
+Image Size:	282.1MB in 5 layers
+Layers:		79.14MB	sha256:ca4d32f962e494ac07eac666330ed3e925014905fc8d170d48428b3fdab6be07
+		1.967kB	sha256:1a1a2275d0557672b42c099ffe43175091d9318f05399897d29911dbbb272ea4
+		18.39MB	sha256:3625e39282d6cf2c0bd647edc3d46b44d78182f9b3b6404ed6ee7f62c181a159
+		144.8MB	sha256:b8f1751bd039859ad91c580a96e744c1a8b2d000c650ff11758e4ddd0940e631
+		39.8MB	sha256:559f601f59e06526a79a5753266b6cfc29c11f0bbd78e40c540b6c5378341f23
+Image Created:	18 months ago
+Author:		<none>
+Arch:		amd64
+Entrypoint:	container-entrypoint
+Command:	/bin/sh -c $STI_SCRIPTS_PATH/usage
+Working Dir:	/opt/app-root/src
+User:		1001
+Exposes Ports:	8080/tcp, 8443/tcp
+Docker Labels:	architecture=x86_64
+		build-date=2021-04-14T21:52:23.120678
+		com.redhat.build-host=cpt-1005.osbs.prod.upshift.rdu2.redhat.com
+		com.redhat.component=php-73-container
+		com.redhat.license_terms=https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI
+		description=PHP 7.3 available as container is a base platform for building and running various PHP 7.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+		distribution-scope=public
+		help=For more information visit https://github.com/sclorg/s2i-php-container
+		io.k8s.description=PHP 7.3 available as container is a base platform for building and running various PHP 7.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+		io.k8s.display-name=Apache 2.4 with PHP 7.3
+		io.openshift.expose-services=8080:http
+		io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+		io.openshift.tags=builder,php,php73,php-73
+		io.s2i.scripts-url=image:///usr/libexec/s2i
+		maintainer=SoftwareCollections.org <sclorg@redhat.com>
+		name=ubi8/php-73
+		release=79.1618436920
+		summary=Platform for building and running PHP 7.3 applications
+		url=https://access.redhat.com/containers/#/registry.access.redhat.com/ubi8/php-73/images/1-79.1618436920
+		usage=s2i build https://github.com/sclorg/s2i-php-container.git --context-dir=7.3/test/test-app ubi8/php-73 sample-server
+		vcs-ref=c1eae9e6b14584fd926812ebf8e0312ab8731b01
+		vcs-type=git
+		vendor=Red Hat, Inc.
+		version=1
+Environment:	PATH=/opt/app-root/src/bin:/opt/app-root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+		container=oci
+		SUMMARY=Platform for building and running PHP 7.3 applications
+		DESCRIPTION=PHP 7.3 available as container is a base platform for building and running various PHP 7.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+		STI_SCRIPTS_URL=image:///usr/libexec/s2i
+		STI_SCRIPTS_PATH=/usr/libexec/s2i
+		APP_ROOT=/opt/app-root
+		HOME=/opt/app-root/src
+		PLATFORM=el8
+		NODEJS_VER=10
+		PHP_VERSION=7.3
+		PHP_VER_SHORT=73
+		NAME=php
+		PHP_CONTAINER_SCRIPTS_PATH=/usr/share/container-scripts/php/
+		APP_DATA=/opt/app-root/src
+		PHP_DEFAULT_INCLUDE_PATH=/usr/share/pear
+		PHP_SYSCONF_PATH=/etc
+		PHP_HTTPD_CONF_FILE=php.conf
+		HTTPD_CONFIGURATION_PATH=/opt/app-root/etc/conf.d
+		HTTPD_MAIN_CONF_PATH=/etc/httpd/conf
+		HTTPD_MAIN_CONF_D_PATH=/etc/httpd/conf.d
+		HTTPD_MODULES_CONF_D_PATH=/etc/httpd/conf.modules.d
+		HTTPD_VAR_RUN=/var/run/httpd
+		HTTPD_DATA_PATH=/var/www
+		HTTPD_DATA_ORIG_PATH=/var/www
+		HTTPD_VAR_PATH=/var
+
+
+[student@workstation trigger-builds]$ oc new-app --name trigger php~http://github.com/${RHT_OCP4_GITHUB_USER}/DO288-apps --context-dir trigger-builds
+warning: Cannot check if git requires authentication.
+--> Found image af703a1 (18 months old) in image stream "developer-trigger-builds/php" under tag "latest" for "php"
+
+    Apache 2.4 with PHP 7.3 
+    ----------------------- 
+    PHP 7.3 available as container is a base platform for building and running various PHP 7.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+
+    Tags: builder, php, php73, php-73
+
+    * A source build using source code from http://github.com/leonardotorresadiera/DO288-apps will be created
+      * The resulting image will be pushed to image stream tag "trigger:latest"
+      * Use 'oc start-build' to trigger a new build
+
+--> Creating resources ...
+    imagestream.image.openshift.io "trigger" created
+    buildconfig.build.openshift.io "trigger" created
+    deployment.apps "trigger" created
+    service "trigger" created
+--> Success
+    Build scheduled, use 'oc logs -f buildconfig/trigger' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/trigger' 
+    Run 'oc status' to view your app.
+[student@workstation trigger-builds]$ oc logs -f bc/trigger
+Adding cluster TLS certificate authority to trust store
+Cloning "http://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	80fbf53c0aed2cd789e202483bad93279349f815 (labs y terminal)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Thu Oct 6 18:25:00 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-07T00:38:01Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1007 00:38:01.545993       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull quay.io/leonardo_adiera/php-73-ubi8@sha256:8b66bdc7e6fe747cb01bbff46f22df7dd1ee4a1bb312b7a0ba13752a70dbd11b...
+Getting image source signatures
+Copying blob sha256:1a1a2275d0557672b42c099ffe43175091d9318f05399897d29911dbbb272ea4
+Copying blob sha256:b8f1751bd039859ad91c580a96e744c1a8b2d000c650ff11758e4ddd0940e631
+Copying blob sha256:3625e39282d6cf2c0bd647edc3d46b44d78182f9b3b6404ed6ee7f62c181a159
+Copying blob sha256:559f601f59e06526a79a5753266b6cfc29c11f0bbd78e40c540b6c5378341f23
+Copying blob sha256:ca4d32f962e494ac07eac666330ed3e925014905fc8d170d48428b3fdab6be07
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image quay.io/leonardo_adiera/php-73-ubi8@sha256:8b66bdc7e6fe747cb01bbff46f22df7dd1ee4a1bb312b7a0ba13752a70dbd11b
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM quay.io/leonardo_adiera/php-73-ubi8@sha256:8b66bdc7e6fe747cb01bbff46f22df7dd1ee4a1bb312b7a0ba13752a70dbd11b
+STEP 2/9: LABEL "io.openshift.build.commit.ref"="main"       "io.openshift.build.commit.message"="labs y terminal"       "io.openshift.build.source-location"="http://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="trigger-builds"       "io.openshift.build.image"="quay.io/leonardo_adiera/php-73-ubi8@sha256:8b66bdc7e6fe747cb01bbff46f22df7dd1ee4a1bb312b7a0ba13752a70dbd11b"       "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Thu Oct 6 18:25:00 2022 -0400"       "io.openshift.build.commit.id"="80fbf53c0aed2cd789e202483bad93279349f815"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="trigger-1"     OPENSHIFT_BUILD_NAMESPACE="developer-trigger-builds"     OPENSHIFT_BUILD_SOURCE="http://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="80fbf53c0aed2cd789e202483bad93279349f815"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source...
+=> sourcing 20-copy-config.sh ...
+---> 00:38:17     Processing additional arbitrary httpd configuration provided by s2i ...
+=> sourcing 00-documentroot.conf ...
+=> sourcing 50-mpm-tuning.conf ...
+=> sourcing 40-ssl-certs.sh ...
+STEP 9/9: CMD /usr/libexec/s2i/run
+COMMIT temp.builder.openshift.io/developer-trigger-builds/trigger-1:1f19a72e
+time="2022-10-07T00:38:18Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:476579af086aee78cb12d88b08fd6b61a80a3f055cae293ec2d15a37dbe7b3f9
+Copying blob sha256:1e8cd6732429ccfaea139348807617a5315fd7ca469850423f77f51661e8fe51
+Copying blob sha256:4f4f36fb1da5a40f49f28511e708b7d4c47e351735053907847992829943e077
+Copying blob sha256:c87487652906a86e96f34d10110c62ded50dac23c035ac4ddc250af679d8cfe9
+Copying blob sha256:3693459e6aaf9c0e9e65bc5b749d864f6d33cd0007f669de0762465712e30ac4
+Copying blob sha256:d561b24b88c896a511c84e691da73444a79c6be3fd2bff74fa70f87b0135e16a
+Copying config sha256:2b8f0c48b8a2b1596f7911cec4636dac169b6e206fad23f2868e2edb33f5ae77
+Writing manifest to image destination
+Storing signatures
+--> 2b8f0c48b8a
+Successfully tagged temp.builder.openshift.io/developer-trigger-builds/trigger-1:1f19a72e
+2b8f0c48b8a2b1596f7911cec4636dac169b6e206fad23f2868e2edb33f5ae77
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-trigger-builds/trigger:latest ...
+Getting image source signatures
+Copying blob sha256:d561b24b88c896a511c84e691da73444a79c6be3fd2bff74fa70f87b0135e16a
+Copying blob sha256:1a1a2275d0557672b42c099ffe43175091d9318f05399897d29911dbbb272ea4
+Copying blob sha256:b8f1751bd039859ad91c580a96e744c1a8b2d000c650ff11758e4ddd0940e631
+Copying blob sha256:559f601f59e06526a79a5753266b6cfc29c11f0bbd78e40c540b6c5378341f23
+Copying blob sha256:3625e39282d6cf2c0bd647edc3d46b44d78182f9b3b6404ed6ee7f62c181a159
+Copying blob sha256:ca4d32f962e494ac07eac666330ed3e925014905fc8d170d48428b3fdab6be07
+Copying config sha256:2b8f0c48b8a2b1596f7911cec4636dac169b6e206fad23f2868e2edb33f5ae77
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-trigger-builds/trigger@sha256:78c1cc0d676f877f1a6ce34560654f77416b7cb80cc72e26fef387ebbc20eaef
+Push successful
+[student@workstation trigger-builds]$ oc get pods
+NAME                       READY   STATUS              RESTARTS   AGE
+trigger-1-build            0/1     Completed           0          41s
+trigger-74684b7cf6-4fs9z   0/1     ContainerCreating   0          5s
+[student@workstation trigger-builds]$ oc describe bc/trigger | grep Triggered
+Triggered by:		Config, ImageChange
+[student@workstation trigger-builds]$ cambiamos el nombre de la imagen..
+bash: cambiamos: command not found...
+[student@workstation trigger-builds]$ skopeo copy --format v2s1 oci-archive:php-73-ubi8-newer.tar.gz docker://quay.io/${RHT_OCP4_QUAY_USER}/php-73-ubi8:latest
+Getting image source signatures
+Copying blob 3be8687e54a9 done  
+Copying blob 2268ee6d0e5a done  
+Copying blob 44368d8124cb done  
+Copying blob cc326b0b9d4d done  
+Copying blob 691a8d1ddde6 done  
+Writing manifest to image destination
+Storing signatures
+[student@workstation trigger-builds]$ dd
+
+
+
+[student@workstation trigger-builds]$ dd
+^C0+0 records in
+0+0 records out
+0 bytes copied, 6.44099 s, 0.0 kB/s
+
+[student@workstation trigger-builds]$ ls -l
+total 561908
+-rwxrwxr-x. 1 student student       172 Sep 15 13:10 oc-new-app.sh
+-rw-r--r--. 1 student student 293272064 Oct  6 20:26 php-73-ubi8-newer.tar.gz
+-rw-r--r--. 1 student student 282104832 Oct  6 20:26 php-73-ubi8-original.tar.gz
+-rwxrwxr-x. 1 student student       264 Sep 15 13:10 push-newer.sh
+-rwxrwxr-x. 1 student student       267 Sep 15 13:10 push-original.sh
+[student@workstation trigger-builds]$ oc import-image php
+imagestream.image.openshift.io/php imported
+
+Name:			php
+Namespace:		developer-trigger-builds
+Created:		11 minutes ago
+Labels:			<none>
+Annotations:		openshift.io/image.dockerRepositoryCheck=2022-10-07T00:43:06Z
+Image Repository:	default-route-openshift-image-registry.apps.ocp4.example.com/developer-trigger-builds/php
+Image Lookup:		local=false
+Unique Images:		2
+Tags:			1
+
+latest
+  tagged from quay.io/leonardo_adiera/php-73-ubi8
+
+  * quay.io/leonardo_adiera/php-73-ubi8@sha256:8ec94fe99bf3baad5fbb0a5089d5ca1fa5583bcf646efa02be83d9a71e16c780
+      Less than a second ago
+    quay.io/leonardo_adiera/php-73-ubi8@sha256:8b66bdc7e6fe747cb01bbff46f22df7dd1ee4a1bb312b7a0ba13752a70dbd11b
+      11 minutes ago
+
+Image Name:	php:latest
+Docker Image:	quay.io/leonardo_adiera/php-73-ubi8@sha256:8ec94fe99bf3baad5fbb0a5089d5ca1fa5583bcf646efa02be83d9a71e16c780
+Name:		sha256:8ec94fe99bf3baad5fbb0a5089d5ca1fa5583bcf646efa02be83d9a71e16c780
+Created:	Less than a second ago
+Annotations:	image.openshift.io/dockerLayersOrder=ascending
+Image Size:	293.3MB in 5 layers
+Layers:		87.39MB	sha256:3be8687e54a9ae50f279c6a04da75395be372a17928b81b5beef4291503c5340
+		1.947kB	sha256:2268ee6d0e5a676861f184cfc302101e88b8833408861c7f4babae0ceb021404
+		17.8MB	sha256:44368d8124cb615c7a79f724e4145771122a073f0f22d1db8d949e6134a6c2af
+		148.5MB	sha256:cc326b0b9d4df8702d8fe01d6a8ad44adb9cd63c7cecfa71b187a88b67c4c956
+		39.58MB	sha256:691a8d1ddde6350bb0d9babe67864eaaaa41a46db9e11ac10376ad31a76bdb90
+Image Created:	15 months ago
+Author:		<none>
+Arch:		amd64
+Entrypoint:	container-entrypoint
+Command:	/bin/sh -c $STI_SCRIPTS_PATH/usage
+Working Dir:	/opt/app-root/src
+User:		1001
+Exposes Ports:	8080/tcp, 8443/tcp
+Docker Labels:	architecture=x86_64
+		build-date=2021-06-23T07:50:55.862185
+		com.redhat.build-host=cpt-1005.osbs.prod.upshift.rdu2.redhat.com
+		com.redhat.component=php-73-container
+		com.redhat.license_terms=https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI
+		description=PHP 7.3 available as container is a base platform for building and running various PHP 7.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+		distribution-scope=public
+		help=For more information visit https://github.com/sclorg/s2i-php-container
+		io.k8s.description=PHP 7.3 available as container is a base platform for building and running various PHP 7.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+		io.k8s.display-name=Apache 2.4 with PHP 7.3
+		io.openshift.expose-services=8080:http
+		io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+		io.openshift.tags=builder,php,php73,php-73
+		io.s2i.scripts-url=image:///usr/libexec/s2i
+		maintainer=SoftwareCollections.org <sclorg@redhat.com>
+		name=ubi8/php-73
+		release=98
+		summary=Platform for building and running PHP 7.3 applications
+		url=https://access.redhat.com/containers/#/registry.access.redhat.com/ubi8/php-73/images/1-98
+		usage=s2i build https://github.com/sclorg/s2i-php-container.git --context-dir=7.3/test/test-app ubi8/php-73 sample-server
+		vcs-ref=ad21e399696d58210dfac48a316db0433503380b
+		vcs-type=git
+		vendor=Red Hat, Inc.
+		version=1
+Environment:	PATH=/opt/app-root/src/bin:/opt/app-root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+		container=oci
+		SUMMARY=Platform for building and running PHP 7.3 applications
+		DESCRIPTION=PHP 7.3 available as container is a base platform for building and running various PHP 7.3 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+		STI_SCRIPTS_URL=image:///usr/libexec/s2i
+		STI_SCRIPTS_PATH=/usr/libexec/s2i
+		APP_ROOT=/opt/app-root
+		HOME=/opt/app-root/src
+		PLATFORM=el8
+		NODEJS_VER=14
+		PHP_VERSION=7.3
+		PHP_VER_SHORT=73
+		NAME=php
+		PHP_CONTAINER_SCRIPTS_PATH=/usr/share/container-scripts/php/
+		APP_DATA=/opt/app-root/src
+		PHP_DEFAULT_INCLUDE_PATH=/usr/share/pear
+		PHP_SYSCONF_PATH=/etc
+		PHP_HTTPD_CONF_FILE=php.conf
+		HTTPD_CONFIGURATION_PATH=/opt/app-root/etc/conf.d
+		HTTPD_MAIN_CONF_PATH=/etc/httpd/conf
+		HTTPD_MAIN_CONF_D_PATH=/etc/httpd/conf.d
+		HTTPD_MODULES_CONF_D_PATH=/etc/httpd/conf.modules.d
+		HTTPD_VAR_RUN=/var/run/httpd
+		HTTPD_DATA_PATH=/var/www
+		HTTPD_DATA_ORIG_PATH=/var/www
+		HTTPD_VAR_PATH=/var
+
+
+[student@workstation trigger-builds]$ oc get builds
+NAME        TYPE     FROM          STATUS     STARTED         DURATION
+trigger-1   Source   Git@80fbf53   Complete   5 minutes ago   39s
+trigger-2   Source   Git@80fbf53   Running    9 seconds ago   
+[student@workstation trigger-builds]$ oc describe build trigger-2 | grep cause
+Build trigger cause:	Image change
+[student@workstation trigger-builds]$ cd 
+[student@workstation ~]$ skopeo delete docker://quay.io/${RHT_OCP4_QUAY_USER}/php-73-ubi8
+FATA[0000] Invalid source name docker://quay.io//php-73-ubi8: invalid reference format 
+[student@workstation ~]$ source /usr/local/etc/ocp4.config
+[student@workstation ~]$ cat /usr/local/etc/ocp4.config
+RHT_OCP4_MASTER_API=https://api.ocp4.example.com:6443/
+RHT_OCP4_WILDCARD_DOMAIN=apps.ocp4.example.com
+RHT_OCP4_NEXUS_SERVER=nexus-common.apps.na410.prod.nextcle.com
+RHT_OCP4_MYSQL_SERVER=mysql.ocp-na46a.prod.ole.redhat.com
+RHT_OCP4_DEV_USER=developer
+RHT_OCP4_DEV_PASSWORD=developer
+RHT_OCP4_GITHUB_USER=leonardotorresadiera
+RHT_OCP4_QUAY_USER=leonardo_adiera
+[student@workstation ~]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+
+Login successful.
+
+You have one project on this server: "developer-trigger-builds"
+
+Using project "developer-trigger-builds".
+[student@workstation ~]$ 
+[student@workstation ~]$ skopeo delete docker://quay.io/${RHT_OCP4_QUAY_USER}/php-73-ubi8
+[student@workstation ~]$ pwd
+/home/student
+[student@workstation ~]$ ls -.l
+ls: invalid option -- '.'
+Try 'ls --help' for more information.
+[student@workstation ~]$ ls -l
+total 152444
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Desktop
+-rw-rw-r--.  1 student student 85020994 Oct  6 18:22 DO2088-labsolutions-expose-image-06.zip
+drwxr-xr-x.  4 student student       35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student     4096 Oct  6 19:56 DO288-apps
+-rw-rw-r--.  1 student student     1749 Oct  5 18:46 DO288-labsolutions-app-config.zip
+-rw-rw-r--.  1 student student     4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+-rw-rw-r--.  1 student student     2297 Oct  4 21:39 DO288-labsolutions-container-build.zip
+-rw-rw-r--.  1 student student     1865 Oct  5 19:10 DO288-labsolutions-design-container.zip
+-rw-rw-r--.  1 student student 70190266 Oct  5 20:36 DO288-labsolutions-external-registry.zip
+-rw-rw-r--.  1 student student     1628 Oct  4 19:16 DO288-lab-solutions-source-build.zip
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student        6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student      193 Sep 16 14:49 grading_master
+-rw-rw-r--.  1 student student     4988 Oct  5 21:29 images-is.txt
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student    24078 Oct  5 18:46 terminal-lab-app-config-05oct22.txt
+-rw-r--r--.  1 student student    71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+-rw-r--r--.  1 student student    35344 Oct  4 21:38 terminal-lab-container-build-04oct22.txt
+-rw-r--r--.  1 student student    42059 Oct  5 19:11 terminal-lab-design-container-05oct22.txt
+-rw-r--r--.  1 student student    80745 Oct  6 18:23 terminal-lab-expose-image-06oct22.txt
+-rw-r--r--.  1 student student     8534 Oct  5 21:16 terminal-lab-expose-registry-05oct22.txt
+-rw-r--r--.  1 student student    17264 Oct  5 20:37 terminal-lab-external-registry-05oct22.txt
+-rw-r--r--.  1 student student    22629 Oct  5 22:02 terminal-lab-image-stream-05oct22.txt
+-rw-r--r--.  1 student student   496726 Oct  6 19:56 terminal-lab-manage-builds-06oct22.txt
+-rw-r--r--.  1 student student    25177 Oct  4 19:17 terminal-lab-source-build-04oct22.txt
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Videos
+[student@workstation ~]$ zip -r DO288-labsolutions-trigger-builds.zip DO288
+  adding: DO288/ (stored 0%)
+  adding: DO288/labs/ (stored 0%)
+  adding: DO288/labs/trigger-builds/ (stored 0%)
+  adding: DO288/labs/trigger-builds/push-original.sh (deflated 18%)
+  adding: DO288/labs/trigger-builds/push-newer.sh (deflated 18%)
+  adding: DO288/labs/trigger-builds/oc-new-app.sh (deflated 14%)
+  adding: DO288/labs/trigger-builds/php-73-ubi8-original.tar.gz (deflated 1%)
+  adding: DO288/labs/trigger-builds/php-73-ubi8-newer.tar.gz (deflated 1%)
+  adding: DO288/solutions/ (stored 0%)
+[student@workstation ~]$ 
+
