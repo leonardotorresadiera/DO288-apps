@@ -1,0 +1,545 @@
+[student@workstation ~]$ 
+[student@workstation ~]$ 
+[student@workstation ~]$ source /usr/local/etc/ocp4.config
+[student@workstation ~]$ cat /usr/local/etc/ocp4.config
+RHT_OCP4_MASTER_API=https://api.ocp4.example.com:6443/
+RHT_OCP4_WILDCARD_DOMAIN=apps.ocp4.example.com
+RHT_OCP4_NEXUS_SERVER=nexus-common.apps.na410.prod.nextcle.com
+RHT_OCP4_MYSQL_SERVER=mysql.ocp-na46a.prod.ole.redhat.com
+RHT_OCP4_DEV_USER=developer
+RHT_OCP4_DEV_PASSWORD=developer
+RHT_OCP4_GITHUB_USER=leonardotorresadiera
+RHT_OCP4_QUAY_USER=leonardo_adiera
+[student@workstation ~]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+Login successful.
+
+You have one project on this server: "developer-trigger-builds"
+
+Using project "developer-trigger-builds".
+[student@workstation ~]$ lab s2i-scripts start
+
+Checking prerequisites for Guided Exercise: Customizing S2I Builds
+
+ Checking local clone of the applications repository:
+ · Folder '/home/student/DO288-apps' is a git repo.............  SUCCESS
+ · Git repo '/home/student/DO288-apps' has no pending changes..  SUCCESS
+ Verify the OpenShift cluster is running:
+ · Router pods are available...................................  SUCCESS
+ · OAuth pods are available....................................  SUCCESS
+ · API pods are available......................................  SUCCESS
+ · No cluster operators are progressing........................  SUCCESS
+ · Control plane node 'master01' is ready......................  SUCCESS
+ Checking for conflicts with existing OpenShift projects:
+ · Project 'developer-s2i-scripts' is absent...................  SUCCESS
+ Checking for conflicts with existing local containers:
+ · Container 'test' is absent..................................  SUCCESS
+
+Overall start status...........................................  SUCCESS
+
+[student@workstation ~]$ 
+[student@workstation ~]$ 
+[student@workstation ~]$ ls -l
+total 152484
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Desktop
+-rw-rw-r--.  1 student student 85020994 Oct  6 18:22 DO2088-labsolutions-expose-image-06.zip
+drwxr-xr-x.  4 student student       35 Oct  3 20:29 DO288
+drwxrwxr-x. 35 student student     4096 Oct  6 21:54 DO288-apps
+-rw-rw-r--.  1 student student     1749 Oct  5 18:46 DO288-labsolutions-app-config.zip
+-rw-rw-r--.  1 student student     2424 Oct  6 21:53 DO288-labsolutions-buildapp.zip
+-rw-rw-r--.  1 student student     4280 Oct  4 19:03 DO288-labsolutions-build-template.zip
+-rw-rw-r--.  1 student student     2297 Oct  4 21:39 DO288-labsolutions-container-build.zip
+-rw-rw-r--.  1 student student     1865 Oct  5 19:10 DO288-labsolutions-design-container.zip
+-rw-rw-r--.  1 student student 70190266 Oct  5 20:36 DO288-labsolutions-external-registry.zip
+-rw-rw-r--.  1 student student     2851 Oct  6 21:39 DO288-labsolutions-postcommit.zip
+-rw-rw-r--.  1 student student     1628 Oct  4 19:16 DO288-lab-solutions-source-build.zip
+-rw-rw-r--.  1 student student     1859 Oct  6 21:17 DO288-labsolutions-trigger-builds.zip
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Documents
+drwxr-xr-x.  2 student student        6 Sep 13 13:33 Downloads
+drwxr-xr-x.  2 student student      193 Sep 16 14:49 grading_master
+-rw-rw-r--.  1 student student     4988 Oct  5 21:29 images-is.txt
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Music
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Pictures
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Public
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Templates
+-rw-r--r--.  1 student student    24078 Oct  5 18:46 terminal-lab-app-config-05oct22.txt
+-rw-r--r--.  1 student student    71688 Oct  4 19:04 terminal-lab-build-template-04oct22.txt
+-rw-r--r--.  1 student student    35344 Oct  4 21:38 terminal-lab-container-build-04oct22.txt
+-rw-r--r--.  1 student student    42059 Oct  5 19:11 terminal-lab-design-container-05oct22.txt
+-rw-r--r--.  1 student student    80745 Oct  6 18:23 terminal-lab-expose-image-06oct22.txt
+-rw-r--r--.  1 student student     8534 Oct  5 21:16 terminal-lab-expose-registry-05oct22.txt
+-rw-r--r--.  1 student student    17264 Oct  5 20:37 terminal-lab-external-registry-05oct22.txt
+-rw-r--r--.  1 student student    22629 Oct  5 22:02 terminal-lab-image-stream-05oct22.txt
+-rw-r--r--.  1 student student   496726 Oct  6 19:56 terminal-lab-manage-builds-06oct22.txt
+-rw-r--r--.  1 student student    25177 Oct  4 19:17 terminal-lab-source-build-04oct22.txt
+-rw-r--r--.  1 student student    28022 Oct  6 20:50 terminal-lab-trigger-builds-06oct22.txt
+drwxr-xr-x.  2 student student        6 Aug 30 11:18 Videos
+[student@workstation ~]$ podman run --name test -it rhscl/httpd-24-rhel7 bash
+Resolved "rhscl/httpd-24-rhel7" as an alias (/etc/containers/registries.conf.d/001-rhel-shortnames.conf)
+Trying to pull registry.access.redhat.com/rhscl/httpd-24-rhel7:latest...
+Getting image source signatures
+Checking if image destination supports signatures
+Copying blob 2722cce8966b done  
+Copying blob 5545cb18afe5 done  
+Copying blob 763ef7cb1190 done  
+Copying blob 13515d19c1b8 done  
+Copying config c26b7ee4ad done  
+Writing manifest to image destination
+Storing signatures
+bash-4.2$ podman images
+bash: podman: command not found
+bash-4.2$ ls -l
+total 0
+bash-4.2$ cat /usr/libexec/s2i/assemble 
+#!/bin/bash
+
+set -e
+
+source ${HTTPD_CONTAINER_SCRIPTS_PATH}/common.sh
+
+echo "---> Enabling s2i support in httpd24 image"
+
+config_s2i
+
+echo "---> Installing application source"
+cp -af /tmp/src/. ./
+rm -rf ./.hg ./.git ./.svn
+
+# Fix source directory permissions
+fix-permissions ./
+
+process_extending_files ${HTTPD_APP_ROOT}/src/httpd-post-assemble/ ${HTTPD_CONTAINER_SCRIPTS_PATH}/post-assemble/
+
+# Fix source directory permissions
+fix-permissions ./
+bash-4.2$ cat /usr/libexec/s2i/run      
+#!/bin/bash
+
+source ${HTTPD_CONTAINER_SCRIPTS_PATH}/common.sh
+
+export HTTPD_RUN_BY_S2I=1
+
+exec run-httpd $@
+bash-4.2$ cat /usr/libexec/s2i/usage
+#!/bin/sh
+
+DISTRO=`cat /etc/*-release | grep ^ID= | grep -Po '".*?"' | tr -d '"'`
+NAMESPACE=centos
+[[ $DISTRO =~ rhel* ]] && NAMESPACE=rhscl
+
+cat <<EOF
+This is a S2I ${IMAGE_DESCRIPTION} ${DISTRO} base image:
+To use it, install S2I: https://github.com/openshift/source-to-image
+
+Sample invocation:
+
+s2i build https://github.com/sclorg/httpd-container.git --context-dir=examples/sample-test-app/ ${NAMESPACE}/httpd-24-${DISTRO}7 httpd-sample-app
+
+You can then run the resulting image via:
+podman run -p 8080:8080 httpd-sample-app
+EOF
+bash-4.2$ exit
+exit
+[student@workstation ~]$ cd DO288-apps/
+[student@workstation DO288-apps]$ git checkout main
+Already on 'main'
+Your branch is up to date with 'origin/main'.
+[student@workstation DO288-apps]$ cat s2i-scripts/index.html 
+Hello Class! DO288 rocks!!!
+[student@workstation DO288-apps]$ cat /home/student/DO288-apps/s2i-scripts/.s2i/bin/assemble 
+#!/bin/bash
+
+set -e
+
+source ${HTTPD_CONTAINER_SCRIPTS_PATH}/common.sh
+
+echo "---> Enabling s2i support in httpd24 image"
+
+config_s2i
+
+######## CUSTOMIZATION STARTS HERE ############
+
+echo "---> Installing application source"
+cp -Rf /tmp/src/*.html ./
+
+DATE=`date "+%b %d, %Y @ %H:%M %p"`
+
+echo "---> Creating info page"
+echo "Page built on $DATE" >> ./info.html
+echo "Proudly served by Apache HTTP Server version $HTTPD_VERSION" >> ./info.html
+
+######## CUSTOMIZATION ENDS HERE ############
+
+if [ -d ./httpd-cfg ]; then
+  echo "---> Copying httpd configuration files..."
+  if [ "$(ls -A ./httpd-cfg/*.conf)" ]; then
+    cp -v ./httpd-cfg/*.conf "${HTTPD_CONFIGURATION_PATH}"
+    rm -rf ./httpd-cfg
+  fi
+else
+  if [ -d ./cfg ]; then
+    echo "---> Copying httpd configuration files from deprecated './cfg' directory, use './httpd-cfg' instead..."
+    if [ "$(ls -A ./cfg/*.conf)" ]; then
+      cp -v ./cfg/*.conf "${HTTPD_CONFIGURATION_PATH}"
+      rm -rf ./cfg
+    fi
+  fi
+fi
+
+# Fix source directory permissions
+fix-permissions ./
+[student@workstation DO288-apps]$ cat /home/student/DO288-apps/s2i-scripts/.s2i/bin/run
+#!/bin/bash
+
+source ${HTTPD_CONTAINER_SCRIPTS_PATH}/common.sh
+
+export HTTPD_RUN_BY_S2I=1
+
+# Make Apache show 'debug' level logs during start up
+exec run-httpd -e debug $@
+[student@workstation DO288-apps]$ oc new-project ${RHT_OCP4_DEV_USER}-s2i-scripts
+Now using project "developer-s2i-scripts" on server "https://api.ocp4.example.com:6443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app rails-postgresql-example
+
+to build a new example application in Ruby. Or use kubectl to deploy a simple Kubernetes application:
+
+    kubectl create deployment hello-node --image=k8s.gcr.io/e2e-test-images/agnhost:2.33 -- /agnhost serve-hostname
+
+[student@workstation DO288-apps]$ oc new-app --name bonjour httpd:2.4~https://github.com/${RHT_OCP4_GITHUB_USER}/DO288-apps --context-dir s2i-scripts
+warning: Cannot check if git requires authentication.
+--> Found image 9a73ba1 (2 months old) in image stream "openshift/httpd" under tag "2.4" for "httpd:2.4"
+
+    Apache httpd 2.4 
+    ---------------- 
+    Apache httpd 2.4 available as container, is a powerful, efficient, and extensible web server. Apache supports a variety of features, many implemented as compiled modules which extend the core functionality. These can range from server-side programming language support to authentication schemes. Virtual hosting allows one Apache installation to serve many different Web sites.
+
+    Tags: builder, httpd, httpd24
+
+    * A source build using source code from https://github.com/leonardotorresadiera/DO288-apps will be created
+      * The resulting image will be pushed to image stream tag "bonjour:latest"
+      * Use 'oc start-build' to trigger a new build
+
+--> Creating resources ...
+    imagestream.image.openshift.io "bonjour" created
+    buildconfig.build.openshift.io "bonjour" created
+    deployment.apps "bonjour" created
+    service "bonjour" created
+--> Success
+    Build scheduled, use 'oc logs -f buildconfig/bonjour' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/bonjour' 
+    Run 'oc status' to view your app.
+[student@workstation DO288-apps]$ oc logs -f bc/bonjour
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	41b00e7ccb326fc35ff8095d9d9625dea901c74b (terminal y labs build-app)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Thu Oct 6 21:55:18 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-10T22:42:01Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1010 22:42:01.108650       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull image-registry.openshift-image-registry.svc:5000/openshift/httpd@sha256:97d5a697c40756b75a606110b77c8cf9a8d284309fe8817a7e9a591e9562b5a2...
+Getting image source signatures
+Copying blob sha256:1c42cd59ba3e0759f1177deb1ff3e4151c7815d732060c46addb2ba1f37d0fb8
+Copying blob sha256:78fa487001cb0a670d8de0fd05c8ec49d86089b8f8090d086d9bb2b28f3b4f35
+Copying blob sha256:e5746dd3575a92053f5871f0c54fdc950a16d792b816f1b798e2ebbd4956b793
+Copying blob sha256:15f0698bae7661201acc9864fd5206fd33316a2fab59433f19122f1eaa6981de
+Copying config sha256:9a73ba1f486c5dbc3335a899990735a72fef9e48436376e10212232ba048487f
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image image-registry.openshift-image-registry.svc:5000/openshift/httpd@sha256:97d5a697c40756b75a606110b77c8cf9a8d284309fe8817a7e9a591e9562b5a2
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/10: FROM image-registry.openshift-image-registry.svc:5000/openshift/httpd@sha256:97d5a697c40756b75a606110b77c8cf9a8d284309fe8817a7e9a591e9562b5a2
+STEP 2/10: LABEL "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Thu Oct 6 21:55:18 2022 -0400"       "io.openshift.build.commit.id"="41b00e7ccb326fc35ff8095d9d9625dea901c74b"       "io.openshift.build.commit.ref"="main"       "io.openshift.build.commit.message"="terminal y labs build-app"       "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="s2i-scripts"       "io.openshift.build.image"="image-registry.openshift-image-registry.svc:5000/openshift/httpd@sha256:97d5a697c40756b75a606110b77c8cf9a8d284309fe8817a7e9a591e9562b5a2"
+STEP 3/10: ENV OPENSHIFT_BUILD_NAME="bonjour-1"     OPENSHIFT_BUILD_NAMESPACE="developer-s2i-scripts"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_COMMIT="41b00e7ccb326fc35ff8095d9d9625dea901c74b"
+STEP 4/10: USER root
+STEP 5/10: COPY upload/scripts /tmp/scripts
+STEP 6/10: COPY upload/src /tmp/src
+STEP 7/10: RUN chown -R 1001:0 /tmp/scripts /tmp/src
+STEP 8/10: USER 1001
+STEP 9/10: RUN /tmp/scripts/assemble
+---> Enabling s2i support in httpd24 image
+    AllowOverride All
+---> Installing application source
+---> Creating info page
+STEP 10/10: CMD /tmp/scripts/run
+COMMIT temp.builder.openshift.io/developer-s2i-scripts/bonjour-1:ab35b220
+time="2022-10-10T22:42:11Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:41cab69aa8d272debd178e0f0325f1ce7030679a5b663e63b080e54340b30b12
+Copying blob sha256:ac12b76679f8ff16aa2d518c298d371c4b2795a4a7ab24eb2e031ea1910379f0
+Copying blob sha256:04085daff9fb8f0dfa9576f409e6265541587d4d36ebdb28652ff4778ad5b318
+Copying blob sha256:c11b59c0d888be2ee156bcb5aec5de298ee0199f98a728795a22852d85ef642e
+Copying blob sha256:19ed8bd82ee0862ceef8238f9b3f00faadfdad751d4a6d470894311234248c21
+Copying config sha256:d57a2d73e3237d67112dcbfa52ee82d655a79c1afff24eb4cee55e0412d5dc0e
+Writing manifest to image destination
+Storing signatures
+--> d57a2d73e32
+Successfully tagged temp.builder.openshift.io/developer-s2i-scripts/bonjour-1:ab35b220
+d57a2d73e3237d67112dcbfa52ee82d655a79c1afff24eb4cee55e0412d5dc0e
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-s2i-scripts/bonjour:latest ...
+Getting image source signatures
+Copying blob sha256:19ed8bd82ee0862ceef8238f9b3f00faadfdad751d4a6d470894311234248c21
+Copying blob sha256:1c42cd59ba3e0759f1177deb1ff3e4151c7815d732060c46addb2ba1f37d0fb8
+Copying blob sha256:e5746dd3575a92053f5871f0c54fdc950a16d792b816f1b798e2ebbd4956b793
+Copying blob sha256:15f0698bae7661201acc9864fd5206fd33316a2fab59433f19122f1eaa6981de
+Copying blob sha256:78fa487001cb0a670d8de0fd05c8ec49d86089b8f8090d086d9bb2b28f3b4f35
+Copying config sha256:d57a2d73e3237d67112dcbfa52ee82d655a79c1afff24eb4cee55e0412d5dc0e
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-s2i-scripts/bonjour@sha256:40d8a817dd66508d514bc1bca9745ce37d92c6af45d961e009f7ecaff71619fb
+Push successful
+[student@workstation DO288-apps]$ oc get pods
+NAME                       READY   STATUS      RESTARTS   AGE
+bonjour-1-build            0/1     Completed   0          55s
+bonjour-669494d9b5-pdg4z   1/1     Running     0          31s
+[student@workstation DO288-apps]$ oc expose svc bonjour
+route.route.openshift.io/bonjour exposed
+[student@workstation DO288-apps]$ oc get route
+NAME      HOST/PORT                                             PATH   SERVICES   PORT       TERMINATION   WILDCARD
+bonjour   bonjour-developer-s2i-scripts.apps.ocp4.example.com          bonjour    8080-tcp                 None
+[student@workstation DO288-apps]$ curl http://bonjour-${RHT_OCP4_DEV_USER}-s2i-scripts.${RHT_OCP4_WILDCARD_DOMAIN}
+Hello Class! DO288 rocks!!!
+[student@workstation DO288-apps]$ curl http://bonjour-${RHT_OCP4_DEV_USER}-s2i-scripts.${RHT_OCP4_WILDCARD_DOMAIN}/info.html
+Page built on Oct 10, 2022 @ 22:42 PM
+Proudly served by Apache HTTP Server version 2.4
+[student@workstation DO288-apps]$ oc logs deployment/bonjour
+=> sourcing 10-set-mpm.sh ...
+=> sourcing 20-copy-config.sh ...
+=> sourcing 40-ssl-certs.sh ...
+---> Generating SSL key pair for httpd...
+[Mon Oct 10 22:42:19.366276 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module access_compat_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_access_compat.so
+[Mon Oct 10 22:42:19.366543 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module actions_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_actions.so
+[Mon Oct 10 22:42:19.366710 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module alias_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_alias.so
+[Mon Oct 10 22:42:19.366889 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module allowmethods_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_allowmethods.so
+[Mon Oct 10 22:42:19.367023 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module auth_basic_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_auth_basic.so
+[Mon Oct 10 22:42:19.367176 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module auth_digest_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_auth_digest.so
+[Mon Oct 10 22:42:19.367300 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_anon_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_anon.so
+[Mon Oct 10 22:42:19.367434 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_core_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_core.so
+[Mon Oct 10 22:42:19.367604 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_dbd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_dbd.so
+[Mon Oct 10 22:42:19.367728 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_dbm_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_dbm.so
+[Mon Oct 10 22:42:19.367861 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_file_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_file.so
+[Mon Oct 10 22:42:19.368005 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_socache_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_socache.so
+[Mon Oct 10 22:42:19.368132 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_core_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_core.so
+[Mon Oct 10 22:42:19.368248 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_dbd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_dbd.so
+[Mon Oct 10 22:42:19.368348 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_dbm_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_dbm.so
+[Mon Oct 10 22:42:19.368444 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_groupfile_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_groupfile.so
+[Mon Oct 10 22:42:19.368535 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_host_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_host.so
+[Mon Oct 10 22:42:19.368633 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_owner_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_owner.so
+[Mon Oct 10 22:42:19.368749 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_user_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_user.so
+[Mon Oct 10 22:42:19.368868 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module autoindex_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_autoindex.so
+[Mon Oct 10 22:42:19.369594 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module cache_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_cache.so
+[Mon Oct 10 22:42:19.369867 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module cache_disk_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_cache_disk.so
+[Mon Oct 10 22:42:19.369990 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module cache_socache_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_cache_socache.so
+[Mon Oct 10 22:42:19.370085 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module data_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_data.so
+[Mon Oct 10 22:42:19.370183 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dbd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dbd.so
+[Mon Oct 10 22:42:19.370333 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module deflate_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_deflate.so
+[Mon Oct 10 22:42:19.370468 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dir_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dir.so
+[Mon Oct 10 22:42:19.370600 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dumpio_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dumpio.so
+[Mon Oct 10 22:42:19.370766 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module echo_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_echo.so
+[Mon Oct 10 22:42:19.370909 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module env_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_env.so
+[Mon Oct 10 22:42:19.371053 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module expires_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_expires.so
+[Mon Oct 10 22:42:19.371208 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module ext_filter_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_ext_filter.so
+[Mon Oct 10 22:42:19.371350 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module filter_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_filter.so
+[Mon Oct 10 22:42:19.371482 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module headers_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_headers.so
+[Mon Oct 10 22:42:19.375493 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module http2_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_http2.so
+[Mon Oct 10 22:42:19.375694 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module include_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_include.so
+[Mon Oct 10 22:42:19.375829 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module info_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_info.so
+[Mon Oct 10 22:42:19.375937 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module log_config_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_log_config.so
+[Mon Oct 10 22:42:19.376023 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module logio_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_logio.so
+[Mon Oct 10 22:42:19.376131 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module macro_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_macro.so
+[Mon Oct 10 22:42:19.376216 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module mime_magic_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_mime_magic.so
+[Mon Oct 10 22:42:19.376301 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module mime_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_mime.so
+[Mon Oct 10 22:42:19.376404 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module negotiation_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_negotiation.so
+[Mon Oct 10 22:42:19.376504 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module remoteip_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_remoteip.so
+[Mon Oct 10 22:42:19.376665 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module reqtimeout_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_reqtimeout.so
+[Mon Oct 10 22:42:19.376758 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module request_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_request.so
+[Mon Oct 10 22:42:19.376877 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module rewrite_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_rewrite.so
+[Mon Oct 10 22:42:19.376967 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module setenvif_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_setenvif.so
+[Mon Oct 10 22:42:19.377080 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module slotmem_plain_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_slotmem_plain.so
+[Mon Oct 10 22:42:19.377176 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module slotmem_shm_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_slotmem_shm.so
+[Mon Oct 10 22:42:19.377259 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module socache_dbm_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_socache_dbm.so
+[Mon Oct 10 22:42:19.377344 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module socache_memcache_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_socache_memcache.so
+[Mon Oct 10 22:42:19.377437 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module socache_shmcb_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_socache_shmcb.so
+[Mon Oct 10 22:42:19.377529 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module status_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_status.so
+[Mon Oct 10 22:42:19.377630 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module substitute_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_substitute.so
+[Mon Oct 10 22:42:19.377719 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module suexec_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_suexec.so
+[Mon Oct 10 22:42:19.377813 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module unique_id_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_unique_id.so
+[Mon Oct 10 22:42:19.377899 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module unixd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_unixd.so
+[Mon Oct 10 22:42:19.377979 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module userdir_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_userdir.so
+[Mon Oct 10 22:42:19.378061 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module version_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_version.so
+[Mon Oct 10 22:42:19.378142 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module vhost_alias_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_vhost_alias.so
+[Mon Oct 10 22:42:19.378232 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module watchdog_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_watchdog.so
+[Mon Oct 10 22:42:19.378468 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dav_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dav.so
+[Mon Oct 10 22:42:19.378643 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dav_fs_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dav_fs.so
+[Mon Oct 10 22:42:19.378752 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dav_lock_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dav_lock.so
+[Mon Oct 10 22:42:19.382506 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lua_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lua.so
+[Mon Oct 10 22:42:19.382748 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module mpm_prefork_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_mpm_prefork.so
+[Mon Oct 10 22:42:19.383023 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy.so
+[Mon Oct 10 22:42:19.383181 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lbmethod_bybusyness_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lbmethod_bybusyness.so
+[Mon Oct 10 22:42:19.383271 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lbmethod_byrequests_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lbmethod_byrequests.so
+[Mon Oct 10 22:42:19.383356 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lbmethod_bytraffic_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lbmethod_bytraffic.so
+[Mon Oct 10 22:42:19.383462 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lbmethod_heartbeat_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lbmethod_heartbeat.so
+[Mon Oct 10 22:42:19.383641 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_ajp_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_ajp.so
+[Mon Oct 10 22:42:19.383809 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_balancer_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_balancer.so
+[Mon Oct 10 22:42:19.383944 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_connect_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_connect.so
+[Mon Oct 10 22:42:19.384051 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_express_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_express.so
+[Mon Oct 10 22:42:19.384168 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_fcgi_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_fcgi.so
+[Mon Oct 10 22:42:19.384275 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_fdpass_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_fdpass.so
+[Mon Oct 10 22:42:19.384412 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_ftp_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_ftp.so
+[Mon Oct 10 22:42:19.384620 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_http_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_http.so
+[Mon Oct 10 22:42:19.384766 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_hcheck_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_hcheck.so
+[Mon Oct 10 22:42:19.384894 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_scgi_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_scgi.so
+[Mon Oct 10 22:42:19.385001 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_uwsgi_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_uwsgi.so
+[Mon Oct 10 22:42:19.385106 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_wstunnel_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_wstunnel.so
+[Mon Oct 10 22:42:19.385901 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module ssl_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_ssl.so
+[Mon Oct 10 22:42:19.386189 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module systemd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_systemd.so
+[Mon Oct 10 22:42:19.386411 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module cgi_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_cgi.so
+[Mon Oct 10 22:42:19.423859 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module ldap_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_ldap.so
+[Mon Oct 10 22:42:19.424257 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authnz_ldap_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authnz_ldap.so
+[Mon Oct 10 22:42:19.424474 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module session_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_session.so
+[Mon Oct 10 22:42:19.424619 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module session_cookie_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_session_cookie.so
+[Mon Oct 10 22:42:19.424757 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module session_dbd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_session_dbd.so
+[Mon Oct 10 22:42:19.424901 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module auth_form_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_auth_form.so
+[Mon Oct 10 22:42:19.472405 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module auth_mellon_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_auth_mellon.so
+[Mon Oct 10 22:42:19.476740 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module security2_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_security2.so
+[Mon Oct 10 22:42:19.478695 2022] [auth_digest:debug] [pid 1] mod_auth_digest.c(372): AH01757: generating secret for digest authentication
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.8.0.67. Set the 'ServerName' directive globally to suppress this message
+[Mon Oct 10 22:42:19.489215 2022] [ssl:info] [pid 1] AH01883: Init: Initialized OpenSSL library
+[Mon Oct 10 22:42:19.489277 2022] [ssl:debug] [pid 1] ssl_engine_init.c(338): AH01886: SSL FIPS mode disabled
+[Mon Oct 10 22:42:19.489746 2022] [ssl:warn] [pid 1] AH01909: 10.8.0.67:8443:0 server certificate does NOT include an ID which matches the server name
+[Mon Oct 10 22:42:19.490436 2022] [:notice] [pid 1] ModSecurity for Apache/2.9.3 (http://www.modsecurity.org/) configured.
+[Mon Oct 10 22:42:19.490445 2022] [:notice] [pid 1] ModSecurity: APR compiled version="1.4.8"; loaded version="1.4.8"
+[Mon Oct 10 22:42:19.490447 2022] [:notice] [pid 1] ModSecurity: PCRE compiled version="8.32 "; loaded version="8.32 2012-11-30"
+[Mon Oct 10 22:42:19.490458 2022] [:notice] [pid 1] ModSecurity: LUA compiled version="Lua 5.1"
+[Mon Oct 10 22:42:19.490459 2022] [:notice] [pid 1] ModSecurity: YAJL compiled version="2.0.4"
+[Mon Oct 10 22:42:19.490461 2022] [:notice] [pid 1] ModSecurity: LIBXML compiled version="2.9.1"
+[Mon Oct 10 22:42:19.490462 2022] [:notice] [pid 1] ModSecurity: Status engine is currently disabled, enable it by set SecStatusEngine to On.
+[Mon Oct 10 22:42:19.493678 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module access_compat_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_access_compat.so
+[Mon Oct 10 22:42:19.493769 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module actions_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_actions.so
+[Mon Oct 10 22:42:19.493855 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module alias_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_alias.so
+[Mon Oct 10 22:42:19.493924 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module allowmethods_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_allowmethods.so
+[Mon Oct 10 22:42:19.493999 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module auth_basic_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_auth_basic.so
+[Mon Oct 10 22:42:19.494094 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module auth_digest_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_auth_digest.so
+[Mon Oct 10 22:42:19.494164 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_anon_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_anon.so
+[Mon Oct 10 22:42:19.494238 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_core_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_core.so
+[Mon Oct 10 22:42:19.494305 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_dbd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_dbd.so
+[Mon Oct 10 22:42:19.494400 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_dbm_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_dbm.so
+[Mon Oct 10 22:42:19.494473 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_file_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_file.so
+[Mon Oct 10 22:42:19.494545 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authn_socache_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authn_socache.so
+[Mon Oct 10 22:42:19.494644 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_core_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_core.so
+[Mon Oct 10 22:42:19.494713 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_dbd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_dbd.so
+[Mon Oct 10 22:42:19.494781 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_dbm_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_dbm.so
+[Mon Oct 10 22:42:19.494854 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_groupfile_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_groupfile.so
+[Mon Oct 10 22:42:19.494926 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_host_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_host.so
+[Mon Oct 10 22:42:19.494991 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_owner_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_owner.so
+[Mon Oct 10 22:42:19.495056 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authz_user_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authz_user.so
+[Mon Oct 10 22:42:19.495153 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module autoindex_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_autoindex.so
+[Mon Oct 10 22:42:19.495275 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module cache_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_cache.so
+[Mon Oct 10 22:42:19.495536 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module cache_disk_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_cache_disk.so
+[Mon Oct 10 22:42:19.495670 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module cache_socache_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_cache_socache.so
+[Mon Oct 10 22:42:19.495750 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module data_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_data.so
+[Mon Oct 10 22:42:19.495841 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dbd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dbd.so
+[Mon Oct 10 22:42:19.495946 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module deflate_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_deflate.so
+[Mon Oct 10 22:42:19.496029 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dir_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dir.so
+[Mon Oct 10 22:42:19.496101 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dumpio_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dumpio.so
+[Mon Oct 10 22:42:19.496179 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module echo_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_echo.so
+[Mon Oct 10 22:42:19.496250 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module env_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_env.so
+[Mon Oct 10 22:42:19.496402 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module expires_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_expires.so
+[Mon Oct 10 22:42:19.496526 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module ext_filter_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_ext_filter.so
+[Mon Oct 10 22:42:19.496622 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module filter_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_filter.so
+[Mon Oct 10 22:42:19.496722 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module headers_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_headers.so
+[Mon Oct 10 22:42:19.500197 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module http2_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_http2.so
+[Mon Oct 10 22:42:19.500376 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module include_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_include.so
+[Mon Oct 10 22:42:19.500502 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module info_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_info.so
+[Mon Oct 10 22:42:19.500618 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module log_config_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_log_config.so
+[Mon Oct 10 22:42:19.500698 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module logio_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_logio.so
+[Mon Oct 10 22:42:19.500791 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module macro_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_macro.so
+[Mon Oct 10 22:42:19.500879 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module mime_magic_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_mime_magic.so
+[Mon Oct 10 22:42:19.500965 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module mime_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_mime.so
+[Mon Oct 10 22:42:19.501081 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module negotiation_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_negotiation.so
+[Mon Oct 10 22:42:19.501174 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module remoteip_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_remoteip.so
+[Mon Oct 10 22:42:19.501281 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module reqtimeout_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_reqtimeout.so
+[Mon Oct 10 22:42:19.501360 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module request_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_request.so
+[Mon Oct 10 22:42:19.501485 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module rewrite_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_rewrite.so
+[Mon Oct 10 22:42:19.501607 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module setenvif_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_setenvif.so
+[Mon Oct 10 22:42:19.501695 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module slotmem_plain_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_slotmem_plain.so
+[Mon Oct 10 22:42:19.501783 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module slotmem_shm_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_slotmem_shm.so
+[Mon Oct 10 22:42:19.501867 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module socache_dbm_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_socache_dbm.so
+[Mon Oct 10 22:42:19.501952 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module socache_memcache_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_socache_memcache.so
+[Mon Oct 10 22:42:19.502032 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module socache_shmcb_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_socache_shmcb.so
+[Mon Oct 10 22:42:19.502125 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module status_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_status.so
+[Mon Oct 10 22:42:19.502220 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module substitute_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_substitute.so
+[Mon Oct 10 22:42:19.502310 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module suexec_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_suexec.so
+[Mon Oct 10 22:42:19.502387 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module unique_id_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_unique_id.so
+[Mon Oct 10 22:42:19.502482 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module unixd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_unixd.so
+[Mon Oct 10 22:42:19.502600 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module userdir_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_userdir.so
+[Mon Oct 10 22:42:19.502699 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module version_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_version.so
+[Mon Oct 10 22:42:19.502841 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module vhost_alias_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_vhost_alias.so
+[Mon Oct 10 22:42:19.502958 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module watchdog_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_watchdog.so
+[Mon Oct 10 22:42:19.503187 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dav_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dav.so
+[Mon Oct 10 22:42:19.503346 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dav_fs_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dav_fs.so
+[Mon Oct 10 22:42:19.503475 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module dav_lock_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_dav_lock.so
+[Mon Oct 10 22:42:19.504063 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lua_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lua.so
+[Mon Oct 10 22:42:19.504230 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module mpm_prefork_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_mpm_prefork.so
+[Mon Oct 10 22:42:19.504482 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy.so
+[Mon Oct 10 22:42:19.504653 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lbmethod_bybusyness_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lbmethod_bybusyness.so
+[Mon Oct 10 22:42:19.504748 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lbmethod_byrequests_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lbmethod_byrequests.so
+[Mon Oct 10 22:42:19.504835 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lbmethod_bytraffic_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lbmethod_bytraffic.so
+[Mon Oct 10 22:42:19.504930 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module lbmethod_heartbeat_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_lbmethod_heartbeat.so
+[Mon Oct 10 22:42:19.505092 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_ajp_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_ajp.so
+[Mon Oct 10 22:42:19.505240 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_balancer_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_balancer.so
+[Mon Oct 10 22:42:19.505344 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_connect_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_connect.so
+[Mon Oct 10 22:42:19.505447 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_express_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_express.so
+[Mon Oct 10 22:42:19.505578 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_fcgi_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_fcgi.so
+[Mon Oct 10 22:42:19.505678 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_fdpass_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_fdpass.so
+[Mon Oct 10 22:42:19.505833 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_ftp_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_ftp.so
+[Mon Oct 10 22:42:19.506029 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_http_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_http.so
+[Mon Oct 10 22:42:19.506211 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_hcheck_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_hcheck.so
+[Mon Oct 10 22:42:19.506346 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_scgi_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_scgi.so
+[Mon Oct 10 22:42:19.506471 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_uwsgi_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_uwsgi.so
+[Mon Oct 10 22:42:19.506597 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module proxy_wstunnel_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_proxy_wstunnel.so
+[Mon Oct 10 22:42:19.507325 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module ssl_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_ssl.so
+[Mon Oct 10 22:42:19.507564 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module systemd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_systemd.so
+[Mon Oct 10 22:42:19.507756 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module cgi_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_cgi.so
+[Mon Oct 10 22:42:19.513996 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module ldap_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_ldap.so
+[Mon Oct 10 22:42:19.514281 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module authnz_ldap_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_authnz_ldap.so
+[Mon Oct 10 22:42:19.514443 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module session_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_session.so
+[Mon Oct 10 22:42:19.514566 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module session_cookie_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_session_cookie.so
+[Mon Oct 10 22:42:19.514673 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module session_dbd_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_session_dbd.so
+[Mon Oct 10 22:42:19.514783 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module auth_form_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_auth_form.so
+[Mon Oct 10 22:42:19.522732 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module auth_mellon_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_auth_mellon.so
+[Mon Oct 10 22:42:19.523807 2022] [so:debug] [pid 1] mod_so.c(266): AH01575: loaded module security2_module from /opt/rh/httpd24/root/etc/httpd/modules/mod_security2.so
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.8.0.67. Set the 'ServerName' directive globally to suppress this message
+[Mon Oct 10 22:42:19.578287 2022] [ssl:info] [pid 1] AH01883: Init: Initialized OpenSSL library
+[Mon Oct 10 22:42:19.578354 2022] [ssl:debug] [pid 1] ssl_engine_init.c(338): AH01886: SSL FIPS mode disabled
+[Mon Oct 10 22:42:19.578818 2022] [ssl:warn] [pid 1] AH01909: 10.8.0.67:8443:0 server certificate does NOT include an ID which matches the server name
+[Mon Oct 10 22:42:19.578965 2022] [http2:warn] [pid 1] AH10034: The mpm module (prefork.c) is not supported by mod_http2. The mpm determines how things are processed in your server. HTTP/2 has more demands in this regard and the currently selected mpm will just not do. This is an advisory warning. Your server will continue to work, but the HTTP/2 protocol will be inactive.
+[Mon Oct 10 22:42:19.579510 2022] [lbmethod_heartbeat:notice] [pid 1] AH02282: No slotmem from mod_heartmonitor
+[Mon Oct 10 22:42:19.584200 2022] [mpm_prefork:notice] [pid 1] AH00163: Apache/2.4.34 (Red Hat) OpenSSL/1.0.2k-fips configured -- resuming normal operations
+[Mon Oct 10 22:42:19.584229 2022] [core:notice] [pid 1] AH00094: Command line: 'httpd -D FOREGROUND -e debug'
+10.8.0.1 - - [10/Oct/2022:22:43:27 +0000] "GET / HTTP/1.1" 200 28 "-" "curl/7.61.1"
+10.8.0.1 - - [10/Oct/2022:22:43:48 +0000] "GET /info.html HTTP/1.1" 200 87 "-" "curl/7.61.1"
+[student@workstation DO288-apps]$ git branch
+* main
+[student@workstation DO288-apps]$ cd ..
+[student@workstation ~]$ oc delete project ${RHT_OCP4_DEV_USER}-s2i-scripts
+project.project.openshift.io "developer-s2i-scripts" deleted
+[student@workstation ~]$ podman rm test
+1395e0073c0c2db96e12203dfb9676553a720b472ce00f104561ca43a415849b
+[student@workstation ~]$ lab s2i-scripts finish
+
+Completing Guided Exercise: Customizing S2I Builds
+
+ · Log in on OpenShift.........................................  SUCCESS
+ · Git repo '/home/student/DO288-apps' has no pending changes..  SUCCESS
+
+Please use start if you wish to do the exercise again.
+
+[student@workstation ~]$ 
+
