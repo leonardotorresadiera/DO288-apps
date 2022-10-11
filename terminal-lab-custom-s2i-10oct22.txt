@@ -1,0 +1,990 @@
+[student@workstation ~]$ lab custom-s2i start
+
+Checking prerequisites for Lab: Customizing Source to Image Builds
+
+ Checking local clone of the applications repository:
+ · Folder '/home/student/DO288-apps' is a git repo.............  SUCCESS
+ · Git repo '/home/student/DO288-apps' has no pending changes..  SUCCESS
+ Verify the OpenShift cluster is running:
+ · Router pods are available...................................  SUCCESS
+ · OAuth pods are available....................................  SUCCESS
+ · API pods are available......................................  SUCCESS
+ · No cluster operators are progressing........................  SUCCESS
+ · Control plane node 'master01' is ready......................  SUCCESS
+ Checking for conflicts with existing OpenShift projects:
+ · Project 'developer-custom-s2i' is absent....................  SUCCESS
+ Checking for conflicts with existing local containers:
+ · Container 'info' is absent..................................  SUCCESS
+ · Project 'go-hello' exists in student's GitHub fork..........  SUCCESS
+
+Setting up the classroom for Lab: Customizing Source to Image Builds
+
+ · Download exercise files.....................................  SUCCESS
+ · Download solution files.....................................  SUCCESS
+
+Overall start status...........................................  SUCCESS
+
+[student@workstation ~]$ cat /home/student/DO288/labs/custom-s2i/s2i/bin/assemble 
+#!/bin/bash -e
+#
+# S2I assemble script for the 's2i-do288-go' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+if [[ "$1" == "-h" ]]; then
+	# If the 's2i-do288-go' assemble script is executed with '-h' flag,
+	# print the usage.
+	exec /usr/libexec/s2i/usage
+fi
+
+echo "---> Installing application source..."
+cp -Rf /tmp/src/. /opt/app-root/
+
+echo "---> Building application from source..."
+go build app.go
+[student@workstation ~]$ cat /home/student/DO288/labs/custom-s2i/Dockerfile 
+# s2i-do288-go
+FROM registry.access.redhat.com/ubi8/ubi:8.0
+
+# Generic labels
+LABEL Component="go" \
+      Name="s2i-do288-go" \
+      Version="1.0" \
+      Release="1"
+
+# Labels consumed by OpenShift
+LABEL io.k8s.description="A Go programming language S2I builder image" \
+      io.k8s.display-name="Go programming language S2I builder image for DO288" \
+      io.openshift.expose-services="8080:http" \
+      io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
+
+# This label is used to categorize this image as a builder image in the
+# OpenShift web console.
+LABEL io.openshift.tags="builder, go, golang"
+
+# Sets the application folder and disables golang cache
+ENV APP_ROOT=/opt/app-root \
+    XDG_CACHE_HOME=off
+
+
+# Install golang package
+RUN   yum install -y --nodocs --disableplugin=subscription-manager golang && \
+      yum clean all --disableplugin=subscription-manager -y 
+
+# TODO: Place the S2I scripts in the correct location
+
+# Permissions to run on OpenShift
+RUN mkdir -p ${APP_ROOT} && \
+    chown -R 1001:1001 ${APP_ROOT} && \
+    chgrp -R 0 ${APP_ROOT} && \
+    chmod -R g=u ${APP_ROOT} && \
+    chmod +x /usr/libexec/s2i/assemble /usr/libexec/s2i/run /usr/libexec/s2i/usage
+
+# This default user is created in the rhel7 image
+USER 1001
+
+EXPOSE 8080
+
+WORKDIR ${APP_ROOT}
+
+CMD ["usage"]
+[student@workstation ~]$ nano /home/student/DO288/labs/custom-s2i/Dockerfile 
+[student@workstation ~]$ cat /home/student/DO288/labs/custom-s2i/Dockerfile 
+# s2i-do288-go
+FROM registry.access.redhat.com/ubi8/ubi:8.0
+
+# Generic labels
+LABEL Component="go" \
+      Name="s2i-do288-go" \
+      Version="1.0" \
+      Release="1"
+
+# Labels consumed by OpenShift
+LABEL io.k8s.description="A Go programming language S2I builder image" \
+      io.k8s.display-name="Go programming language S2I builder image for DO288" \
+      io.openshift.expose-services="8080:http" \
+      io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
+
+# This label is used to categorize this image as a builder image in the
+# OpenShift web console.
+LABEL io.openshift.tags="builder, go, golang"
+
+# Sets the application folder and disables golang cache
+ENV APP_ROOT=/opt/app-root \
+    XDG_CACHE_HOME=off
+
+
+# Install golang package
+RUN   yum install -y --nodocs --disableplugin=subscription-manager golang && \
+      yum clean all --disableplugin=subscription-manager -y 
+
+# TODO: Place the S2I scripts in the correct location
+COPY ./s2i/bin /usr/libexec/s2i
+
+# Permissions to run on OpenShift
+RUN mkdir -p ${APP_ROOT} && \
+    chown -R 1001:1001 ${APP_ROOT} && \
+    chgrp -R 0 ${APP_ROOT} && \
+    chmod -R g=u ${APP_ROOT} && \
+    chmod +x /usr/libexec/s2i/assemble /usr/libexec/s2i/run /usr/libexec/s2i/usage
+
+# This default user is created in the rhel7 image
+USER 1001
+
+EXPOSE 8080
+
+WORKDIR ${APP_ROOT}
+
+CMD ["usage"]
+[student@workstation ~]$ cd ~/DO288/labs/custom-s2i
+[student@workstation custom-s2i]$ ls -l
+total 12
+-rwxrwxr-x. 1 student student  166 Sep 15 13:10 create-secret.sh
+-rw-rw-r--. 1 student student 1338 Oct 10 20:57 Dockerfile
+-rwxrwxr-x. 1 student student   83 Sep 15 13:10 local-test.sh
+drwxrwxr-x. 3 student student   17 Sep 15 13:10 s2i
+drwxrwxr-x. 3 student student   22 Sep 15 13:10 test
+[student@workstation custom-s2i]$ podman buidl -t s2i-do288-go .
+Error: unknown shorthand flag: 't' in -t
+See 'podman --help'
+[student@workstation custom-s2i]$ podman build -t s2i-do288-go .
+STEP 1/12: FROM registry.access.redhat.com/ubi8/ubi:8.0
+STEP 2/12: LABEL Component="go"       Name="s2i-do288-go"       Version="1.0"       Release="1"
+--> 969f5c1899b
+STEP 3/12: LABEL io.k8s.description="A Go programming language S2I builder image"       io.k8s.display-name="Go programming language S2I builder image for DO288"       io.openshift.expose-services="8080:http"       io.openshift.s2i.scripts-url="image:///usr/libexec/s2i"
+--> b445bb5a433
+STEP 4/12: LABEL io.openshift.tags="builder, go, golang"
+--> 2dad7261e26
+STEP 5/12: ENV APP_ROOT=/opt/app-root     XDG_CACHE_HOME=off
+--> 8ac99d896f3
+STEP 6/12: RUN   yum install -y --nodocs --disableplugin=subscription-manager golang &&       yum clean all --disableplugin=subscription-manager -y 
+Red Hat Universal Base Image 8 (RPMs) - AppStre 1.4 MB/s | 3.0 MB     00:02    
+Red Hat Universal Base Image 8 (RPMs) - BaseOS  388 kB/s | 803 kB     00:02    
+Dependencies resolved.
+================================================================================
+ Package                Arch   Version                    Repository       Size
+================================================================================
+Installing:
+ golang                 x86_64 1.17.12-1.module+el8.6.0+16014+a372c00b
+                                                          ubi-8-appstream 692 k
+Upgrading:
+ libsepol               x86_64 2.9-3.el8                  ubi-8-baseos    340 k
+ glibc                  x86_64 2.28-189.5.el8_6           ubi-8-baseos    2.2 M
+ keyutils-libs          x86_64 1.5.10-9.el8               ubi-8-baseos     34 k
+ glibc-common           x86_64 2.28-189.5.el8_6           ubi-8-baseos    1.3 M
+ libgcc                 x86_64 8.5.0-10.1.el8_6           ubi-8-baseos     80 k
+ libselinux             x86_64 2.9-5.el8                  ubi-8-baseos    165 k
+ pcre2                  x86_64 10.32-3.el8_6              ubi-8-baseos    247 k
+ krb5-libs              x86_64 1.18.2-14.el8              ubi-8-baseos    840 k
+ libxcrypt              x86_64 4.1.1-6.el8                ubi-8-baseos     73 k
+ openssl-libs           x86_64 1:1.1.1k-7.el8_6           ubi-8-baseos    1.5 M
+ glibc-minimal-langpack x86_64 2.28-189.5.el8_6           ubi-8-baseos     61 k
+ zlib                   x86_64 1.2.11-18.el8_5            ubi-8-baseos    102 k
+ libcom_err             x86_64 1.45.6-4.el8               ubi-8-baseos     49 k
+Installing dependencies:
+ isl                    x86_64 0.16.1-6.el8               ubi-8-appstream 841 k
+ libmpc                 x86_64 1.1.0-9.1.el8              ubi-8-appstream  61 k
+ cpp                    x86_64 8.5.0-10.1.el8_6           ubi-8-appstream  10 M
+ golang-src             noarch 1.17.12-1.module+el8.6.0+16014+a372c00b
+                                                          ubi-8-appstream 9.0 M
+ golang-bin             x86_64 1.17.12-1.module+el8.6.0+16014+a372c00b
+                                                          ubi-8-appstream  99 M
+ gcc                    x86_64 8.5.0-10.1.el8_6           ubi-8-appstream  23 M
+ libxcrypt-devel        x86_64 4.1.1-6.el8                ubi-8-baseos     25 k
+ keyutils-libs-devel    x86_64 1.5.10-9.el8               ubi-8-baseos     48 k
+ kernel-headers         x86_64 4.18.0-372.26.1.el8_6      ubi-8-baseos    9.4 M
+ libverto-devel         x86_64 0.3.0-5.el8                ubi-8-baseos     18 k
+ glibc-headers          x86_64 2.28-189.5.el8_6           ubi-8-baseos    484 k
+ openssl-devel          x86_64 1:1.1.1k-7.el8_6           ubi-8-baseos    2.3 M
+ pcre2-utf32            x86_64 10.32-3.el8_6              ubi-8-baseos    220 k
+ libsepol-devel         x86_64 2.9-3.el8                  ubi-8-baseos     87 k
+ binutils               x86_64 2.30-113.el8               ubi-8-baseos    5.8 M
+ libselinux-devel       x86_64 2.9-5.el8                  ubi-8-baseos    200 k
+ libkadm5               x86_64 1.18.2-14.el8              ubi-8-baseos    187 k
+ diffutils              x86_64 3.6-6.el8                  ubi-8-baseos    359 k
+ openssl                x86_64 1:1.1.1k-7.el8_6           ubi-8-baseos    709 k
+ zlib-devel             x86_64 1.2.11-18.el8_5            ubi-8-baseos     58 k
+ libcom_err-devel       x86_64 1.45.6-4.el8               ubi-8-baseos     39 k
+ pcre2-devel            x86_64 10.32-3.el8_6              ubi-8-baseos    605 k
+ krb5-devel             x86_64 1.18.2-14.el8              ubi-8-baseos    560 k
+ pcre2-utf16            x86_64 10.32-3.el8_6              ubi-8-baseos    229 k
+ libgomp                x86_64 8.5.0-10.1.el8_6           ubi-8-baseos    207 k
+ glibc-devel            x86_64 2.28-189.5.el8_6           ubi-8-baseos     80 k
+Installing weak dependencies:
+ glibc-gconv-extra      x86_64 2.28-189.5.el8_6           ubi-8-baseos    1.5 M
+ openssl-pkcs11         x86_64 0.4.10-2.el8               ubi-8-baseos     66 k
+ glibc-langpack-en      x86_64 2.28-189.5.el8_6           ubi-8-baseos    834 k
+Enabling module streams:
+ go-toolset                    rhel8                                           
+
+Transaction Summary
+================================================================================
+Install  30 Packages
+Upgrade  13 Packages
+
+Total download size: 174 M
+Downloading Packages:
+(1/43): libmpc-1.1.0-9.1.el8.x86_64.rpm          59 kB/s |  61 kB     00:01    
+(2/43): cpp-8.5.0-10.1.el8_6.x86_64.rpm         9.2 MB/s |  10 MB     00:01    
+(3/43): isl-0.16.1-6.el8.x86_64.rpm             492 kB/s | 841 kB     00:01    
+(4/43): golang-1.17.12-1.module+el8.6.0+16014+a 774 kB/s | 692 kB     00:00    
+(5/43): gcc-8.5.0-10.1.el8_6.x86_64.rpm          83 MB/s |  23 MB     00:00    
+(6/43): libxcrypt-devel-4.1.1-6.el8.x86_64.rpm  169 kB/s |  25 kB     00:00    
+(7/43): keyutils-libs-devel-1.5.10-9.el8.x86_64 629 kB/s |  48 kB     00:00    
+(8/43): golang-src-1.17.12-1.module+el8.6.0+160 5.7 MB/s | 9.0 MB     00:01    
+(9/43): glibc-gconv-extra-2.28-189.5.el8_6.x86_  20 MB/s | 1.5 MB     00:00    
+(10/43): libverto-devel-0.3.0-5.el8.x86_64.rpm  287 kB/s |  18 kB     00:00    
+(11/43): kernel-headers-4.18.0-372.26.1.el8_6.x  83 MB/s | 9.4 MB     00:00    
+(12/43): glibc-headers-2.28-189.5.el8_6.x86_64.  10 MB/s | 484 kB     00:00    
+(13/43): pcre2-utf32-10.32-3.el8_6.x86_64.rpm   4.5 MB/s | 220 kB     00:00    
+(14/43): openssl-devel-1.1.1k-7.el8_6.x86_64.rp  21 MB/s | 2.3 MB     00:00    
+(15/43): libsepol-devel-2.9-3.el8.x86_64.rpm    1.5 MB/s |  87 kB     00:00    
+(16/43): libselinux-devel-2.9-5.el8.x86_64.rpm  2.5 MB/s | 200 kB     00:00    
+(17/43): binutils-2.30-113.el8.x86_64.rpm        55 MB/s | 5.8 MB     00:00    
+(18/43): libkadm5-1.18.2-14.el8.x86_64.rpm      6.2 MB/s | 187 kB     00:00    
+(19/43): openssl-1.1.1k-7.el8_6.x86_64.rpm       41 MB/s | 709 kB     00:00    
+(20/43): diffutils-3.6-6.el8.x86_64.rpm          14 MB/s | 359 kB     00:00    
+(21/43): zlib-devel-1.2.11-18.el8_5.x86_64.rpm  3.7 MB/s |  58 kB     00:00    
+(22/43): libcom_err-devel-1.45.6-4.el8.x86_64.r 1.7 MB/s |  39 kB     00:00    
+(23/43): openssl-pkcs11-0.4.10-2.el8.x86_64.rpm 4.8 MB/s |  66 kB     00:00    
+(24/43): glibc-langpack-en-2.28-189.5.el8_6.x86  24 MB/s | 834 kB     00:00    
+(25/43): pcre2-devel-10.32-3.el8_6.x86_64.rpm    14 MB/s | 605 kB     00:00    
+(26/43): krb5-devel-1.18.2-14.el8.x86_64.rpm     39 MB/s | 560 kB     00:00    
+(27/43): pcre2-utf16-10.32-3.el8_6.x86_64.rpm    18 MB/s | 229 kB     00:00    
+(28/43): libgomp-8.5.0-10.1.el8_6.x86_64.rpm    7.2 MB/s | 207 kB     00:00    
+(29/43): glibc-devel-2.28-189.5.el8_6.x86_64.rp 3.4 MB/s |  80 kB     00:00    
+(30/43): libsepol-2.9-3.el8.x86_64.rpm           19 MB/s | 340 kB     00:00    
+(31/43): keyutils-libs-1.5.10-9.el8.x86_64.rpm  6.4 MB/s |  34 kB     00:00    
+(32/43): glibc-2.28-189.5.el8_6.x86_64.rpm       50 MB/s | 2.2 MB     00:00    
+(33/43): glibc-common-2.28-189.5.el8_6.x86_64.r  40 MB/s | 1.3 MB     00:00    
+(34/43): libselinux-2.9-5.el8.x86_64.rpm         18 MB/s | 165 kB     00:00    
+(35/43): libgcc-8.5.0-10.1.el8_6.x86_64.rpm     3.6 MB/s |  80 kB     00:00    
+(36/43): pcre2-10.32-3.el8_6.x86_64.rpm          17 MB/s | 247 kB     00:00    
+(37/43): libxcrypt-4.1.1-6.el8.x86_64.rpm       7.2 MB/s |  73 kB     00:00    
+(38/43): krb5-libs-1.18.2-14.el8.x86_64.rpm      15 MB/s | 840 kB     00:00    
+(39/43): openssl-libs-1.1.1k-7.el8_6.x86_64.rpm  37 MB/s | 1.5 MB     00:00    
+(40/43): glibc-minimal-langpack-2.28-189.5.el8_ 6.0 MB/s |  61 kB     00:00    
+(41/43): zlib-1.2.11-18.el8_5.x86_64.rpm        8.9 MB/s | 102 kB     00:00    
+(42/43): libcom_err-1.45.6-4.el8.x86_64.rpm     1.2 MB/s |  49 kB     00:00    
+(43/43): golang-bin-1.17.12-1.module+el8.6.0+16  23 MB/s |  99 MB     00:04    
+--------------------------------------------------------------------------------
+Total                                            29 MB/s | 174 MB     00:06     
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Running scriptlet: golang-1.17.12-1.module+el8.6.0+16014+a372c00b.x86_6   1/1 
+  Preparing        :                                                        1/1 
+  Upgrading        : libgcc-8.5.0-10.1.el8_6.x86_64                        1/56 
+  Running scriptlet: libgcc-8.5.0-10.1.el8_6.x86_64                        1/56 
+  Upgrading        : libsepol-2.9-3.el8.x86_64                             2/56 
+  Running scriptlet: libsepol-2.9-3.el8.x86_64                             2/56 
+  Installing       : glibc-langpack-en-2.28-189.5.el8_6.x86_64             3/56 
+  Upgrading        : glibc-common-2.28-189.5.el8_6.x86_64                  4/56 
+  Upgrading        : libselinux-2.9-5.el8.x86_64                           5/56 
+  Upgrading        : pcre2-10.32-3.el8_6.x86_64                            6/56 
+  Running scriptlet: glibc-2.28-189.5.el8_6.x86_64                         7/56 
+  Upgrading        : glibc-2.28-189.5.el8_6.x86_64                         7/56 
+  Running scriptlet: glibc-2.28-189.5.el8_6.x86_64                         7/56 
+warning: /etc/nsswitch.conf created as /etc/nsswitch.conf.rpmnew
+
+  Installing       : glibc-gconv-extra-2.28-189.5.el8_6.x86_64             8/56 
+  Running scriptlet: glibc-gconv-extra-2.28-189.5.el8_6.x86_64             8/56 
+  Upgrading        : zlib-1.2.11-18.el8_5.x86_64                           9/56 
+  Upgrading        : keyutils-libs-1.5.10-9.el8.x86_64                    10/56 
+  Upgrading        : libcom_err-1.45.6-4.el8.x86_64                       11/56 
+  Running scriptlet: libcom_err-1.45.6-4.el8.x86_64                       11/56 
+  Installing       : libmpc-1.1.0-9.1.el8.x86_64                          12/56 
+  Installing       : cpp-8.5.0-10.1.el8_6.x86_64                          13/56 
+  Running scriptlet: cpp-8.5.0-10.1.el8_6.x86_64                          13/56 
+  Installing       : libcom_err-devel-1.45.6-4.el8.x86_64                 14/56 
+  Installing       : keyutils-libs-devel-1.5.10-9.el8.x86_64              15/56 
+  Installing       : binutils-2.30-113.el8.x86_64                         16/56 
+  Running scriptlet: binutils-2.30-113.el8.x86_64                         16/56 
+install-info: No such file or directory for /usr/share/info/as.info.gz
+install-info: No such file or directory for /usr/share/info/binutils.info.gz
+install-info: No such file or directory for /usr/share/info/gprof.info.gz
+install-info: No such file or directory for /usr/share/info/ld.info.gz
+install-info: No such file or directory for /usr/share/info/standards.info.gz
+
+  Installing       : openssl-1:1.1.1k-7.el8_6.x86_64                      17/56 
+  Installing       : openssl-pkcs11-0.4.10-2.el8.x86_64                   18/56 
+  Upgrading        : openssl-libs-1:1.1.1k-7.el8_6.x86_64                 19/56 
+  Running scriptlet: openssl-libs-1:1.1.1k-7.el8_6.x86_64                 19/56 
+  Upgrading        : krb5-libs-1.18.2-14.el8.x86_64                       20/56 
+  Installing       : libkadm5-1.18.2-14.el8.x86_64                        21/56 
+  Installing       : zlib-devel-1.2.11-18.el8_5.x86_64                    22/56 
+  Installing       : isl-0.16.1-6.el8.x86_64                              23/56 
+  Running scriptlet: isl-0.16.1-6.el8.x86_64                              23/56 
+  Installing       : pcre2-utf32-10.32-3.el8_6.x86_64                     24/56 
+  Installing       : diffutils-3.6-6.el8.x86_64                           25/56 
+  Running scriptlet: diffutils-3.6-6.el8.x86_64                           25/56 
+install-info: No such file or directory for /usr/share/info/diffutils.info
+
+  Installing       : pcre2-utf16-10.32-3.el8_6.x86_64                     26/56 
+  Installing       : pcre2-devel-10.32-3.el8_6.x86_64                     27/56 
+  Installing       : libgomp-8.5.0-10.1.el8_6.x86_64                      28/56 
+  Running scriptlet: libgomp-8.5.0-10.1.el8_6.x86_64                      28/56 
+  Upgrading        : libxcrypt-4.1.1-6.el8.x86_64                         29/56 
+  Installing       : libsepol-devel-2.9-3.el8.x86_64                      30/56 
+  Installing       : libselinux-devel-2.9-5.el8.x86_64                    31/56 
+  Installing       : libverto-devel-0.3.0-5.el8.x86_64                    32/56 
+  Installing       : krb5-devel-1.18.2-14.el8.x86_64                      33/56 
+  Installing       : openssl-devel-1:1.1.1k-7.el8_6.x86_64                34/56 
+  Installing       : kernel-headers-4.18.0-372.26.1.el8_6.x86_64          35/56 
+  Running scriptlet: glibc-headers-2.28-189.5.el8_6.x86_64                36/56 
+  Installing       : glibc-headers-2.28-189.5.el8_6.x86_64                36/56 
+  Installing       : glibc-devel-2.28-189.5.el8_6.x86_64                  37/56 
+  Running scriptlet: glibc-devel-2.28-189.5.el8_6.x86_64                  37/56 
+  Installing       : libxcrypt-devel-4.1.1-6.el8.x86_64                   38/56 
+  Installing       : gcc-8.5.0-10.1.el8_6.x86_64                          39/56 
+  Running scriptlet: gcc-8.5.0-10.1.el8_6.x86_64                          39/56 
+  Installing       : golang-src-1.17.12-1.module+el8.6.0+16014+a372c00b   40/56 
+  Installing       : golang-1.17.12-1.module+el8.6.0+16014+a372c00b.x86   41/56 
+  Installing       : golang-bin-1.17.12-1.module+el8.6.0+16014+a372c00b   42/56 
+  Upgrading        : glibc-minimal-langpack-2.28-189.5.el8_6.x86_64       43/56 
+  Cleanup          : krb5-libs-1.16.1-22.el8.x86_64                       44/56 
+  Cleanup          : openssl-libs-1:1.1.1-8.el8.x86_64                    45/56 
+  Running scriptlet: openssl-libs-1:1.1.1-8.el8.x86_64                    45/56 
+  Cleanup          : libcom_err-1.44.3-2.el8.x86_64                       46/56 
+  Running scriptlet: libcom_err-1.44.3-2.el8.x86_64                       46/56 
+  Cleanup          : keyutils-libs-1.5.10-6.el8.x86_64                    47/56 
+  Cleanup          : libxcrypt-4.1.1-4.el8.x86_64                         48/56 
+  Cleanup          : zlib-1.2.11-10.el8.x86_64                            49/56 
+  Cleanup          : glibc-minimal-langpack-2.28-42.el8_0.1.x86_64        50/56 
+  Cleanup          : glibc-common-2.28-42.el8_0.1.x86_64                  51/56 
+  Cleanup          : libselinux-2.8-6.el8.x86_64                          52/56 
+  Cleanup          : pcre2-10.32-1.el8.x86_64                             53/56 
+  Cleanup          : libsepol-2.8-2.el8.x86_64                            54/56 
+  Running scriptlet: libsepol-2.8-2.el8.x86_64                            54/56 
+  Cleanup          : glibc-2.28-42.el8_0.1.x86_64                         55/56 
+  Cleanup          : libgcc-8.2.1-3.5.el8.x86_64                          56/56 
+  Running scriptlet: libgcc-8.2.1-3.5.el8.x86_64                          56/56 
+  Running scriptlet: glibc-common-2.28-189.5.el8_6.x86_64                 56/56 
+  Verifying        : isl-0.16.1-6.el8.x86_64                               1/56 
+  Verifying        : libmpc-1.1.0-9.1.el8.x86_64                           2/56 
+  Verifying        : cpp-8.5.0-10.1.el8_6.x86_64                           3/56 
+  Verifying        : golang-src-1.17.12-1.module+el8.6.0+16014+a372c00b    4/56 
+  Verifying        : golang-1.17.12-1.module+el8.6.0+16014+a372c00b.x86    5/56 
+  Verifying        : golang-bin-1.17.12-1.module+el8.6.0+16014+a372c00b    6/56 
+  Verifying        : gcc-8.5.0-10.1.el8_6.x86_64                           7/56 
+  Verifying        : libxcrypt-devel-4.1.1-6.el8.x86_64                    8/56 
+  Verifying        : keyutils-libs-devel-1.5.10-9.el8.x86_64               9/56 
+  Verifying        : glibc-gconv-extra-2.28-189.5.el8_6.x86_64            10/56 
+  Verifying        : kernel-headers-4.18.0-372.26.1.el8_6.x86_64          11/56 
+  Verifying        : libverto-devel-0.3.0-5.el8.x86_64                    12/56 
+  Verifying        : glibc-headers-2.28-189.5.el8_6.x86_64                13/56 
+  Verifying        : openssl-devel-1:1.1.1k-7.el8_6.x86_64                14/56 
+  Verifying        : pcre2-utf32-10.32-3.el8_6.x86_64                     15/56 
+  Verifying        : libsepol-devel-2.9-3.el8.x86_64                      16/56 
+  Verifying        : binutils-2.30-113.el8.x86_64                         17/56 
+  Verifying        : libselinux-devel-2.9-5.el8.x86_64                    18/56 
+  Verifying        : libkadm5-1.18.2-14.el8.x86_64                        19/56 
+  Verifying        : diffutils-3.6-6.el8.x86_64                           20/56 
+  Verifying        : openssl-1:1.1.1k-7.el8_6.x86_64                      21/56 
+  Verifying        : zlib-devel-1.2.11-18.el8_5.x86_64                    22/56 
+  Verifying        : libcom_err-devel-1.45.6-4.el8.x86_64                 23/56 
+  Verifying        : openssl-pkcs11-0.4.10-2.el8.x86_64                   24/56 
+  Verifying        : glibc-langpack-en-2.28-189.5.el8_6.x86_64            25/56 
+  Verifying        : pcre2-devel-10.32-3.el8_6.x86_64                     26/56 
+  Verifying        : krb5-devel-1.18.2-14.el8.x86_64                      27/56 
+  Verifying        : pcre2-utf16-10.32-3.el8_6.x86_64                     28/56 
+  Verifying        : libgomp-8.5.0-10.1.el8_6.x86_64                      29/56 
+  Verifying        : glibc-devel-2.28-189.5.el8_6.x86_64                  30/56 
+  Verifying        : libsepol-2.9-3.el8.x86_64                            31/56 
+  Verifying        : libsepol-2.8-2.el8.x86_64                            32/56 
+  Verifying        : glibc-2.28-189.5.el8_6.x86_64                        33/56 
+  Verifying        : glibc-2.28-42.el8_0.1.x86_64                         34/56 
+  Verifying        : keyutils-libs-1.5.10-9.el8.x86_64                    35/56 
+  Verifying        : keyutils-libs-1.5.10-6.el8.x86_64                    36/56 
+  Verifying        : glibc-common-2.28-189.5.el8_6.x86_64                 37/56 
+  Verifying        : glibc-common-2.28-42.el8_0.1.x86_64                  38/56 
+  Verifying        : libgcc-8.5.0-10.1.el8_6.x86_64                       39/56 
+  Verifying        : libgcc-8.2.1-3.5.el8.x86_64                          40/56 
+  Verifying        : libselinux-2.9-5.el8.x86_64                          41/56 
+  Verifying        : libselinux-2.8-6.el8.x86_64                          42/56 
+  Verifying        : pcre2-10.32-3.el8_6.x86_64                           43/56 
+  Verifying        : pcre2-10.32-1.el8.x86_64                             44/56 
+  Verifying        : krb5-libs-1.18.2-14.el8.x86_64                       45/56 
+  Verifying        : krb5-libs-1.16.1-22.el8.x86_64                       46/56 
+  Verifying        : libxcrypt-4.1.1-6.el8.x86_64                         47/56 
+  Verifying        : libxcrypt-4.1.1-4.el8.x86_64                         48/56 
+  Verifying        : openssl-libs-1:1.1.1k-7.el8_6.x86_64                 49/56 
+  Verifying        : openssl-libs-1:1.1.1-8.el8.x86_64                    50/56 
+  Verifying        : glibc-minimal-langpack-2.28-189.5.el8_6.x86_64       51/56 
+  Verifying        : glibc-minimal-langpack-2.28-42.el8_0.1.x86_64        52/56 
+  Verifying        : zlib-1.2.11-18.el8_5.x86_64                          53/56 
+  Verifying        : zlib-1.2.11-10.el8.x86_64                            54/56 
+  Verifying        : libcom_err-1.45.6-4.el8.x86_64                       55/56 
+  Verifying        : libcom_err-1.44.3-2.el8.x86_64                       56/56 
+Installed products updated.
+
+Upgraded:
+  libsepol-2.9-3.el8.x86_64                                                     
+  glibc-2.28-189.5.el8_6.x86_64                                                 
+  keyutils-libs-1.5.10-9.el8.x86_64                                             
+  glibc-common-2.28-189.5.el8_6.x86_64                                          
+  libgcc-8.5.0-10.1.el8_6.x86_64                                                
+  libselinux-2.9-5.el8.x86_64                                                   
+  pcre2-10.32-3.el8_6.x86_64                                                    
+  krb5-libs-1.18.2-14.el8.x86_64                                                
+  libxcrypt-4.1.1-6.el8.x86_64                                                  
+  openssl-libs-1:1.1.1k-7.el8_6.x86_64                                          
+  glibc-minimal-langpack-2.28-189.5.el8_6.x86_64                                
+  zlib-1.2.11-18.el8_5.x86_64                                                   
+  libcom_err-1.45.6-4.el8.x86_64                                                
+
+Installed:
+  golang-1.17.12-1.module+el8.6.0+16014+a372c00b.x86_64                         
+  glibc-gconv-extra-2.28-189.5.el8_6.x86_64                                     
+  openssl-pkcs11-0.4.10-2.el8.x86_64                                            
+  glibc-langpack-en-2.28-189.5.el8_6.x86_64                                     
+  isl-0.16.1-6.el8.x86_64                                                       
+  libmpc-1.1.0-9.1.el8.x86_64                                                   
+  cpp-8.5.0-10.1.el8_6.x86_64                                                   
+  golang-src-1.17.12-1.module+el8.6.0+16014+a372c00b.noarch                     
+  golang-bin-1.17.12-1.module+el8.6.0+16014+a372c00b.x86_64                     
+  gcc-8.5.0-10.1.el8_6.x86_64                                                   
+  libxcrypt-devel-4.1.1-6.el8.x86_64                                            
+  keyutils-libs-devel-1.5.10-9.el8.x86_64                                       
+  kernel-headers-4.18.0-372.26.1.el8_6.x86_64                                   
+  libverto-devel-0.3.0-5.el8.x86_64                                             
+  glibc-headers-2.28-189.5.el8_6.x86_64                                         
+  openssl-devel-1:1.1.1k-7.el8_6.x86_64                                         
+  pcre2-utf32-10.32-3.el8_6.x86_64                                              
+  libsepol-devel-2.9-3.el8.x86_64                                               
+  binutils-2.30-113.el8.x86_64                                                  
+  libselinux-devel-2.9-5.el8.x86_64                                             
+  libkadm5-1.18.2-14.el8.x86_64                                                 
+  diffutils-3.6-6.el8.x86_64                                                    
+  openssl-1:1.1.1k-7.el8_6.x86_64                                               
+  zlib-devel-1.2.11-18.el8_5.x86_64                                             
+  libcom_err-devel-1.45.6-4.el8.x86_64                                          
+  pcre2-devel-10.32-3.el8_6.x86_64                                              
+  krb5-devel-1.18.2-14.el8.x86_64                                               
+  pcre2-utf16-10.32-3.el8_6.x86_64                                              
+  libgomp-8.5.0-10.1.el8_6.x86_64                                               
+  glibc-devel-2.28-189.5.el8_6.x86_64                                           
+
+Complete!
+16 files removed
+--> 0db8aec171e
+STEP 7/12: COPY ./s2i/bin /usr/libexec/s2i
+--> 558779f008f
+STEP 8/12: RUN mkdir -p ${APP_ROOT} &&     chown -R 1001:1001 ${APP_ROOT} &&     chgrp -R 0 ${APP_ROOT} &&     chmod -R g=u ${APP_ROOT} &&     chmod +x /usr/libexec/s2i/assemble /usr/libexec/s2i/run /usr/libexec/s2i/usage
+--> c4c02e208ab
+STEP 9/12: USER 1001
+--> 47e99a810c1
+STEP 10/12: EXPOSE 8080
+--> 70ef8c8a264
+STEP 11/12: WORKDIR ${APP_ROOT}
+--> 1d6322b8442
+STEP 12/12: CMD ["usage"]
+COMMIT s2i-do288-go
+--> aa620537abd
+Successfully tagged localhost/s2i-do288-go:latest
+aa620537abdf5581a69d6f09b784f903566047ceddf9103ca1ac174afe327cfd
+[student@workstation custom-s2i]$ podman images
+REPOSITORY                                       TAG         IMAGE ID      CREATED        SIZE
+localhost/s2i-do288-go                           latest      aa620537abdf  3 minutes ago  815 MB
+localhost/do288-hello-java                       latest      36bb5d5bca4f  5 days ago     461 MB
+quay.io/leonardo_adiera/do288-hello-java         latest      36bb5d5bca4f  5 days ago     461 MB
+registry.access.redhat.com/rhscl/httpd-24-rhel7  latest      c26b7ee4adae  7 days ago     332 MB
+registry.access.redhat.com/ubi8/ubi              8.0         11f9dba4d1bc  3 years ago    216 MB
+quay.io/leonardo_adiera/ubi-sleep                1.0         3c63b4841913  3 years ago    216 MB
+[student@workstation custom-s2i]$ mkdir /home/student/s2i-go-app
+[student@workstation custom-s2i]$ s2i build test/test-app/ s2i-do288-go s2i-go-app --as-dockerfile /home/student/s2i-go-app/Dockerfile
+Application dockerfile generated in /home/student/s2i-go-app/Dockerfile
+[student@workstation custom-s2i]$ cat /home/student/s2i-go-app/Dockerfile
+FROM s2i-do288-go
+LABEL "io.k8s.display-name"="s2i-go-app" \
+      "io.openshift.s2i.build.image"="s2i-do288-go" \
+      "io.openshift.s2i.build.source-location"="test/test-app/"
+
+USER root
+# Copying in source code
+COPY upload/src /tmp/src
+# Change file ownership to the assemble user. Builder image must support chown command.
+RUN chown -R 1001:0 /tmp/src
+USER 1001
+# Assemble script sourced from builder image based on user input or image metadata.
+# If this file does not exist in the image, the build will fail.
+RUN /usr/libexec/s2i/assemble
+# Run script sourced from builder image based on user input or image metadata.
+# If this file does not exist in the image, the build will fail.
+CMD /usr/libexec/s2i/run
+[student@workstation custom-s2i]$ cd ..
+[student@workstation labs]$ cd ..
+[student@workstation DO288]$ cd ..
+[student@workstation ~]$ cd s2i-go-app/
+[student@workstation s2i-go-app]$ podmain build -t s2i-go-app .
+bash: podmain: command not found...
+[student@workstation s2i-go-app]$ podman build -t s2i-go-app .
+STEP 1/8: FROM s2i-do288-go
+STEP 2/8: LABEL "io.k8s.display-name"="s2i-go-app"       "io.openshift.s2i.build.image"="s2i-do288-go"       "io.openshift.s2i.build.source-location"="test/test-app/"
+--> b25215a7eda
+STEP 3/8: USER root
+--> d2d731d19c4
+STEP 4/8: COPY upload/src /tmp/src
+--> eecb53e69d7
+STEP 5/8: RUN chown -R 1001:0 /tmp/src
+--> d0095b14695
+STEP 6/8: USER 1001
+--> 6dbc43ad812
+STEP 7/8: RUN /usr/libexec/s2i/assemble
+---> Installing application source...
+---> Building application from source...
+--> a426061e6c0
+STEP 8/8: CMD /usr/libexec/s2i/run
+COMMIT s2i-go-app
+--> 94c1a59fd36
+Successfully tagged localhost/s2i-go-app:latest
+94c1a59fd36197dc6affddaf50c495df12ee0352bff10f5552bd2da8d4feb3c8
+[student@workstation s2i-go-app]$ podman images
+REPOSITORY                                       TAG         IMAGE ID      CREATED        SIZE
+localhost/s2i-go-app                             latest      94c1a59fd361  7 seconds ago  822 MB
+localhost/s2i-do288-go                           latest      aa620537abdf  5 minutes ago  815 MB
+localhost/do288-hello-java                       latest      36bb5d5bca4f  5 days ago     461 MB
+quay.io/leonardo_adiera/do288-hello-java         latest      36bb5d5bca4f  5 days ago     461 MB
+registry.access.redhat.com/rhscl/httpd-24-rhel7  latest      c26b7ee4adae  7 days ago     332 MB
+registry.access.redhat.com/ubi8/ubi              8.0         11f9dba4d1bc  3 years ago    216 MB
+quay.io/leonardo_adiera/ubi-sleep                1.0         3c63b4841913  3 years ago    216 MB
+[student@workstation s2i-go-app]$ podman run --name go-test -u 1234 -p 8080:8080 -d s2i-go-app
+88a1de0da64d3785507fb40e3481fe08d5e0a4b36816c205877ef9d6cd2f3a60
+[student@workstation s2i-go-app]$ podman ps
+CONTAINER ID  IMAGE                        COMMAND               CREATED        STATUS            PORTS                   NAMES
+88a1de0da64d  localhost/s2i-go-app:latest  /bin/sh -c /usr/l...  4 seconds ago  Up 5 seconds ago  0.0.0.0:8080->8080/tcp  go-test
+[student@workstation s2i-go-app]$ curl http://localhost:8080/user1
+Hello user1!. Welcome!
+[student@workstation s2i-go-app]$ podman stop go-tets
+Error: no container with name or ID "go-tets" found: no such container
+[student@workstation s2i-go-app]$ podman stop go-test
+go-test
+[student@workstation s2i-go-app]$ source /usr/local/etc/ocp4.config
+[student@workstation s2i-go-app]$ podman login quay.io -u ${RHT_OCP4_QUAY_USER}
+Password: 
+Login Succeeded!
+[student@workstation s2i-go-app]$ skopeo copy --format v2s1 containers-storage:localhost/s2i-do288-go docker://quay.io/${RHT_OCP4_QUAY_USER}/s2i-do288-go
+Getting image source signatures
+Copying blob 3817f0a90aca done  
+Copying blob 1ba07923cecb done  
+Copying blob 48905dae4010 skipped: already exists  
+Copying blob 6866631b657e skipped: already exists  
+Copying blob 3f510d9170a0 done  
+Writing manifest to image destination
+Storing signatures
+[student@workstation s2i-go-app]$ oc login -u ${RHT_OCP4_DEV_USER} -p ${RHT_OCP4_DEV_PASSWORD} ${RHT_OCP4_MASTER_API}
+Login successful.
+
+You have one project on this server: "developer-trigger-builds"
+
+Using project "developer-trigger-builds".
+[student@workstation s2i-go-app]$ oc new-project developer-custom-s2i
+Now using project "developer-custom-s2i" on server "https://api.ocp4.example.com:6443".
+
+You can add applications to this project with the 'new-app' command. For example, try:
+
+    oc new-app rails-postgresql-example
+
+to build a new example application in Ruby. Or use kubectl to deploy a simple Kubernetes application:
+
+    kubectl create deployment hello-node --image=k8s.gcr.io/e2e-test-images/agnhost:2.33 -- /agnhost serve-hostname
+
+[student@workstation s2i-go-app]$ podman login -u ${RHT_OCP4_QUAY_USER} quay.io
+Password: 
+Login Succeeded!
+[student@workstation s2i-go-app]$ oc create secret generic quayio --from-file .dockerconfigjson=${XDG_RUNTIME_DIR}/containers/auth.json --type=kubernetes.io/dockerconfigjson
+secret/quayio created
+[student@workstation s2i-go-app]$ oc secrets link builder quayio
+[student@workstation s2i-go-app]$ oc import-image s2i-do288-go --from quay.io/${RHT_OCP4_QUAY_USER}/s2i-do288-go --confirm
+imagestream.image.openshift.io/s2i-do288-go imported
+
+Name:			s2i-do288-go
+Namespace:		developer-custom-s2i
+Created:		Less than a second ago
+Labels:			<none>
+Annotations:		openshift.io/image.dockerRepositoryCheck=2022-10-11T01:10:36Z
+Image Repository:	default-route-openshift-image-registry.apps.ocp4.example.com/developer-custom-s2i/s2i-do288-go
+Image Lookup:		local=false
+Unique Images:		1
+Tags:			1
+
+latest
+  tagged from quay.io/leonardo_adiera/s2i-do288-go
+
+  * quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55
+      Less than a second ago
+
+Image Name:	s2i-do288-go:latest
+Docker Image:	quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55
+Name:		sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55
+Created:	Less than a second ago
+Annotations:	image.openshift.io/dockerLayersOrder=ascending
+Image Size:	286.4MB in 13 layers
+Layers:		73.99MB	sha256:28132fe8e9d5451667353dae25c063a0fd7171ed836811b98bfdab93e7dffd97
+		1.6kB	sha256:e3b66044195e70f58deab8b929e85278aeafe0838978b6822d4cd1d330ae30af
+		32B	sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+		0B	sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+		0B	sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+		0B	sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+		212.4MB	sha256:222d76361d1bc3a5d7c238e17e1dae4e4fbfcf538c45f30198a3a62b5085cbfe
+		895B	sha256:531c5439d789dc233d7669372422d465b983ec7dd7397a4a6a1a928cf1c887ff
+		1.112kB	sha256:78ac7b5c0c81c20494ba03b0ff5b582b90a27890dcc55b7571f09b3823f61931
+		0B	sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+		0B	sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+		0B	sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+		0B	sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Image Created:	10 minutes ago
+Author:		<none>
+Arch:		amd64
+Command:	usage
+Working Dir:	/opt/app-root
+User:		1001
+Exposes Ports:	8080/tcp
+Docker Labels:	Component=go
+		Name=s2i-do288-go
+		Release=1
+		Version=1.0
+		architecture=x86_64
+		authoritative-source-url=registry.access.redhat.com
+		build-date=2019-09-16T12:28:55.971236
+		com.redhat.build-host=cpt-1001.osbs.prod.upshift.rdu2.redhat.com
+		com.redhat.component=ubi8-container
+		com.redhat.license_terms=https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI
+		description=The Universal Base Image is designed and engineered to be the base layer for all of your containerized applications, middleware and utilities. This base image is freely redistributable, but Red Hat only supports Red Hat technologies through subscriptions for Red Hat products. This image is maintained by Red Hat and updated regularly.
+		distribution-scope=public
+		io.buildah.version=1.24.1
+		io.k8s.description=A Go programming language S2I builder image
+		io.k8s.display-name=Go programming language S2I builder image for DO288
+		io.openshift.expose-services=8080:http
+		io.openshift.s2i.scripts-url=image:///usr/libexec/s2i
+		io.openshift.tags=builder, go, golang
+		maintainer=Red Hat, Inc.
+		name=ubi8
+		release=208
+		summary=Provides the latest release of Red Hat Universal Base Image 8.
+		url=https://access.redhat.com/containers/#/registry.access.redhat.com/ubi8/images/8.0-208
+		vcs-ref=592956edf47ff0ce45123f240898eabb469ac836
+		vcs-type=git
+		vendor=Red Hat, Inc.
+		version=8.0
+Environment:	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+		container=oci
+		APP_ROOT=/opt/app-root
+		XDG_CACHE_HOME=off
+
+
+[student@workstation s2i-go-app]$ oc get is
+NAME           IMAGE REPOSITORY                                                                                 TAGS     UPDATED
+s2i-do288-go   default-route-openshift-image-registry.apps.ocp4.example.com/developer-custom-s2i/s2i-do288-go   latest   5 seconds ago
+[student@workstation s2i-go-app]$ cd ..
+[student@workstation ~]$ ls -
+ls: cannot access '-': No such file or directory
+[student@workstation ~]$ pwd
+/home/student
+[student@workstation ~]$ cd DO288-apps/
+[student@workstation DO288-apps]$ git checkout -b custom-s2i
+Switched to a new branch 'custom-s2i'
+[student@workstation DO288-apps]$ git push -u origin custom-s2i
+Username for 'https://github.com': leonardotorresochoa
+Password for 'https://leonardotorresochoa@github.com': 
+Total 0 (delta 0), reused 0 (delta 0), pack-reused 0
+remote: 
+remote: Create a pull request for 'custom-s2i' on GitHub by visiting:
+remote:      https://github.com/leonardotorresadiera/DO288-apps/pull/new/custom-s2i
+remote: 
+To https://github.com/leonardotorresadiera/DO288-apps
+ * [new branch]      custom-s2i -> custom-s2i
+Branch 'custom-s2i' set up to track remote branch 'custom-s2i' from 'origin'.
+[student@workstation DO288-apps]$ cd ..
+[student@workstation ~]$ oc new-app --name greet s2i-do288-go~https://github.com/${RHT_OCP4_GITHUB_USER}/DO288-apps#custom-s2i --context-dir=go-hello
+warning: Cannot check if git requires authentication.
+--> Found image fd3c176 (13 minutes old) in image stream "developer-custom-s2i/s2i-do288-go" under tag "latest" for "s2i-do288-go"
+
+    Go programming language S2I builder image for DO288 
+    --------------------------------------------------- 
+    A Go programming language S2I builder image
+
+    Tags: builder,  go,  golang
+
+    * A source build using source code from https://github.com/leonardotorresadiera/DO288-apps#custom-s2i will be created
+      * The resulting image will be pushed to image stream tag "greet:latest"
+      * Use 'oc start-build' to trigger a new build
+
+--> Creating resources ...
+    imagestream.image.openshift.io "greet" created
+    buildconfig.build.openshift.io "greet" created
+    deployment.apps "greet" created
+    service "greet" created
+--> Success
+    Build scheduled, use 'oc logs -f buildconfig/greet' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose service/greet' 
+    Run 'oc status' to view your app.
+[student@workstation ~]$ oc logs -f bc/greet
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	7ed2455d35f75b7921aa7b54069902f75ce85b3f (apache s2i)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Mon Oct 10 20:52:54 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-11T01:13:10Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1011 01:13:10.041670       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55...
+Getting image source signatures
+Copying blob sha256:28132fe8e9d5451667353dae25c063a0fd7171ed836811b98bfdab93e7dffd97
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:e3b66044195e70f58deab8b929e85278aeafe0838978b6822d4cd1d330ae30af
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:78ac7b5c0c81c20494ba03b0ff5b582b90a27890dcc55b7571f09b3823f61931
+Copying blob sha256:222d76361d1bc3a5d7c238e17e1dae4e4fbfcf538c45f30198a3a62b5085cbfe
+Copying blob sha256:531c5439d789dc233d7669372422d465b983ec7dd7397a4a6a1a928cf1c887ff
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/9: FROM quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55
+STEP 2/9: LABEL "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Mon Oct 10 20:52:54 2022 -0400"       "io.openshift.build.commit.id"="7ed2455d35f75b7921aa7b54069902f75ce85b3f"       "io.openshift.build.commit.ref"="custom-s2i"       "io.openshift.build.commit.message"="apache s2i"       "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="go-hello"       "io.openshift.build.image"="quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55"
+STEP 3/9: ENV OPENSHIFT_BUILD_NAME="greet-1"     OPENSHIFT_BUILD_NAMESPACE="developer-custom-s2i"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_REFERENCE="custom-s2i"     OPENSHIFT_BUILD_COMMIT="7ed2455d35f75b7921aa7b54069902f75ce85b3f"
+STEP 4/9: USER root
+STEP 5/9: COPY upload/src /tmp/src
+STEP 6/9: RUN chown -R 1001:0 /tmp/src
+STEP 7/9: USER 1001
+STEP 8/9: RUN /usr/libexec/s2i/assemble
+---> Installing application source...
+---> Building application from source...
+STEP 9/9: CMD /usr/libexec/s2i/run
+COMMIT temp.builder.openshift.io/developer-custom-s2i/greet-1:41de0314
+time="2022-10-11T01:13:27Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:6866631b657ec5662f4faf948c771d9585a8ea005b1373360ada0a4507cd5c09
+Copying blob sha256:48905dae401049ac43befb4f900a6aa0b5d30119db1f0cd0cca92980e0040ad0
+Copying blob sha256:3f510d9170a05ec5ebdda6f7cccaf01bbee0aad74a3fe666f4706315247b3824
+Copying blob sha256:1ba07923cecb51f2f2258496e84e8f1dacefdea31c4e9a2a95a340f51bb113aa
+Copying blob sha256:3817f0a90acaa7f56711c836303690741fb1187cf4627a7e7ce0dbbb2acc4b77
+Copying blob sha256:f60c28d9c9b1b3678e432776e2206713be5ccadc04430721d9958c83a9dfe639
+Copying config sha256:65e1269898b3a65c5af8ddc24eeb347a7977381ecad790e5063dde782562887e
+Writing manifest to image destination
+Storing signatures
+--> 65e1269898b
+Successfully tagged temp.builder.openshift.io/developer-custom-s2i/greet-1:41de0314
+65e1269898b3a65c5af8ddc24eeb347a7977381ecad790e5063dde782562887e
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-custom-s2i/greet:latest ...
+Getting image source signatures
+Copying blob sha256:78ac7b5c0c81c20494ba03b0ff5b582b90a27890dcc55b7571f09b3823f61931
+Copying blob sha256:531c5439d789dc233d7669372422d465b983ec7dd7397a4a6a1a928cf1c887ff
+Copying blob sha256:222d76361d1bc3a5d7c238e17e1dae4e4fbfcf538c45f30198a3a62b5085cbfe
+Copying blob sha256:f60c28d9c9b1b3678e432776e2206713be5ccadc04430721d9958c83a9dfe639
+Copying blob sha256:e3b66044195e70f58deab8b929e85278aeafe0838978b6822d4cd1d330ae30af
+Copying blob sha256:28132fe8e9d5451667353dae25c063a0fd7171ed836811b98bfdab93e7dffd97
+Copying config sha256:65e1269898b3a65c5af8ddc24eeb347a7977381ecad790e5063dde782562887e
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-custom-s2i/greet@sha256:a5670692be0ec6c1ca55559a8cbd9dee2c1cdc6a9557993dd2fc446ff3a65ac4
+Push successful
+[student@workstation ~]$ oc get pods
+NAME                     READY   STATUS              RESTARTS   AGE
+greet-1-build            0/1     Completed           0          41s
+greet-58977b65dc-5lkgk   0/1     ContainerCreating   0          5s
+[student@workstation ~]$ oc get pods
+NAME                     READY   STATUS              RESTARTS   AGE
+greet-1-build            0/1     Completed           0          44s
+greet-58977b65dc-5lkgk   0/1     ContainerCreating   0          8s
+[student@workstation ~]$ oc get pods
+NAME                     READY   STATUS              RESTARTS   AGE
+greet-1-build            0/1     Completed           0          45s
+greet-58977b65dc-5lkgk   0/1     ContainerCreating   0          9s
+[student@workstation ~]$ oc get pods
+NAME                     READY   STATUS              RESTARTS   AGE
+greet-1-build            0/1     Completed           0          46s
+greet-58977b65dc-5lkgk   0/1     ContainerCreating   0          10s
+[student@workstation ~]$ oc get pods
+NAME                     READY   STATUS      RESTARTS   AGE
+greet-1-build            0/1     Completed   0          56s
+greet-58977b65dc-5lkgk   1/1     Running     0          20s
+[student@workstation ~]$ oc expose svc greet
+route.route.openshift.io/greet exposed
+[student@workstation ~]$ oc get route
+NAME    HOST/PORT                                          PATH   SERVICES   PORT       TERMINATION   WILDCARD
+greet   greet-developer-custom-s2i.apps.ocp4.example.com          greet      8080-tcp                 None
+[student@workstation ~]$ curl http://greet-developer-custom-s2i.apps.ocp4.example.com/user1
+Hello user1!. Welcome!
+[student@workstation ~]$ greet-developer-custom-s2i.apps.ocp4.example.com
+bash: greet-developer-custom-s2i.apps.ocp4.example.com: command not found...
+[student@workstation ~]$ mkdir -p ~/DO288-apps/go-hello/.s2i/bin
+[student@workstation ~]$ cp ~/DO288/labs/custom-s2i/s2i/bin/run ~/DO288-apps/go-hello/.s2i/bin/
+[student@workstation ~]$ cat ~/DO288/solutions/custom-s2i/s2i/bin/run.es
+#!/bin/bash -e
+#
+# S2I run script for the 's2i-do288-go' image.
+# The run script executes the server that runs your application.
+#
+# For more information see the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+echo "Starting app with lang option 'es'..."
+exec /opt/app-root/app --lang es
+[student@workstation ~]$ cd DO288-apps/
+[student@workstation DO288-apps]$ git add .
+[student@workstation DO288-apps]$ git commit -m "custom-s2i"
+[custom-s2i 7090f53] custom-s2i
+ Committer: Student User <student@workstation.lab.example.com>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 11 insertions(+)
+ create mode 100755 go-hello/.s2i/bin/run
+[student@workstation DO288-apps]$ git status
+On branch custom-s2i
+Your branch is ahead of 'origin/custom-s2i' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+[student@workstation DO288-apps]$ cd go-hello/
+[student@workstation go-hello]$ git add .
+[student@workstation go-hello]$ git commit -m "custom-s2i"
+On branch custom-s2i
+Your branch is ahead of 'origin/custom-s2i' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+[student@workstation go-hello]$ git push
+Username for 'https://github.com': leonardotorresochoa
+Password for 'https://leonardotorresochoa@github.com': 
+Enumerating objects: 8, done.
+Counting objects: 100% (8/8), done.
+Delta compression using up to 2 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (6/6), 630 bytes | 630.00 KiB/s, done.
+Total 6 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To https://github.com/leonardotorresadiera/DO288-apps
+   7ed2455..7090f53  custom-s2i -> custom-s2i
+[student@workstation go-hello]$ cd ..
+[student@workstation DO288-apps]$ oc start-build greet
+build.build.openshift.io/greet-2 started
+[student@workstation DO288-apps]$ oc logs -f bc/greetç
+Error from server (NotFound): buildconfigs.build.openshift.io "greetç" not found
+[student@workstation DO288-apps]$ oc logs -f bc/greet
+Adding cluster TLS certificate authority to trust store
+Cloning "https://github.com/leonardotorresadiera/DO288-apps" ...
+	Commit:	7090f539f5e4fa919413dab8adeca00ab99b7fdc (custom-s2i)
+	Author:	Student User <student@workstation.lab.example.com>
+	Date:	Mon Oct 10 21:17:25 2022 -0400
+Adding cluster TLS certificate authority to trust store
+Adding cluster TLS certificate authority to trust store
+time="2022-10-11T01:19:05Z" level=info msg="Not using native diff for overlay, this may cause degraded performance for building images: kernel has CONFIG_OVERLAY_FS_REDIRECT_DIR enabled"
+I1011 01:19:05.536665       1 defaults.go:102] Defaulting to storage driver "overlay" with options [mountopt=metacopy=on].
+Caching blobs under "/var/cache/blobs".
+Trying to pull quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55...
+Getting image source signatures
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:e3b66044195e70f58deab8b929e85278aeafe0838978b6822d4cd1d330ae30af
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:28132fe8e9d5451667353dae25c063a0fd7171ed836811b98bfdab93e7dffd97
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:a3ed95caeb02ffe68cdd9fd84406680ae93d633cb16422d00e8a7c22955b46d4
+Copying blob sha256:222d76361d1bc3a5d7c238e17e1dae4e4fbfcf538c45f30198a3a62b5085cbfe
+Copying blob sha256:78ac7b5c0c81c20494ba03b0ff5b582b90a27890dcc55b7571f09b3823f61931
+Copying blob sha256:531c5439d789dc233d7669372422d465b983ec7dd7397a4a6a1a928cf1c887ff
+Writing manifest to image destination
+Storing signatures
+Generating dockerfile with builder image quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55
+Adding transient rw bind mount for /run/secrets/rhsm
+STEP 1/10: FROM quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55
+STEP 2/10: LABEL "io.openshift.build.image"="quay.io/leonardo_adiera/s2i-do288-go@sha256:bd673d14140e1cf9c73ec68cbf859d774c9128edaaeca9339299e61299a23f55"       "io.openshift.build.commit.author"="Student User <student@workstation.lab.example.com>"       "io.openshift.build.commit.date"="Mon Oct 10 21:17:25 2022 -0400"       "io.openshift.build.commit.id"="7090f539f5e4fa919413dab8adeca00ab99b7fdc"       "io.openshift.build.commit.ref"="custom-s2i"       "io.openshift.build.commit.message"="custom-s2i"       "io.openshift.build.source-location"="https://github.com/leonardotorresadiera/DO288-apps"       "io.openshift.build.source-context-dir"="go-hello"
+STEP 3/10: ENV OPENSHIFT_BUILD_NAME="greet-2"     OPENSHIFT_BUILD_NAMESPACE="developer-custom-s2i"     OPENSHIFT_BUILD_SOURCE="https://github.com/leonardotorresadiera/DO288-apps"     OPENSHIFT_BUILD_REFERENCE="custom-s2i"     OPENSHIFT_BUILD_COMMIT="7090f539f5e4fa919413dab8adeca00ab99b7fdc"
+STEP 4/10: USER root
+STEP 5/10: COPY upload/scripts /tmp/scripts
+STEP 6/10: COPY upload/src /tmp/src
+STEP 7/10: RUN chown -R 1001:0 /tmp/scripts /tmp/src
+STEP 8/10: USER 1001
+STEP 9/10: RUN /usr/libexec/s2i/assemble
+---> Installing application source...
+---> Building application from source...
+STEP 10/10: CMD /tmp/scripts/run
+COMMIT temp.builder.openshift.io/developer-custom-s2i/greet-2:a9f44670
+time="2022-10-11T01:19:22Z" level=warning msg="Adding metacopy option, configured globally"
+Getting image source signatures
+Copying blob sha256:6866631b657ec5662f4faf948c771d9585a8ea005b1373360ada0a4507cd5c09
+Copying blob sha256:48905dae401049ac43befb4f900a6aa0b5d30119db1f0cd0cca92980e0040ad0
+Copying blob sha256:3f510d9170a05ec5ebdda6f7cccaf01bbee0aad74a3fe666f4706315247b3824
+Copying blob sha256:1ba07923cecb51f2f2258496e84e8f1dacefdea31c4e9a2a95a340f51bb113aa
+Copying blob sha256:3817f0a90acaa7f56711c836303690741fb1187cf4627a7e7ce0dbbb2acc4b77
+Copying blob sha256:f2c81c7e710ff04331394de46bc567f40c358d9bf637311b3e00c57204d68f31
+Copying config sha256:b7d1983d1fb6bb874fedd92c7f059a6c135283b81cddb5627fcd8da240034f94
+Writing manifest to image destination
+Storing signatures
+--> b7d1983d1fb
+Successfully tagged temp.builder.openshift.io/developer-custom-s2i/greet-2:a9f44670
+b7d1983d1fb6bb874fedd92c7f059a6c135283b81cddb5627fcd8da240034f94
+
+Pushing image image-registry.openshift-image-registry.svc:5000/developer-custom-s2i/greet:latest ...
+Getting image source signatures
+Copying blob sha256:531c5439d789dc233d7669372422d465b983ec7dd7397a4a6a1a928cf1c887ff
+Copying blob sha256:222d76361d1bc3a5d7c238e17e1dae4e4fbfcf538c45f30198a3a62b5085cbfe
+Copying blob sha256:28132fe8e9d5451667353dae25c063a0fd7171ed836811b98bfdab93e7dffd97
+Copying blob sha256:e3b66044195e70f58deab8b929e85278aeafe0838978b6822d4cd1d330ae30af
+Copying blob sha256:f2c81c7e710ff04331394de46bc567f40c358d9bf637311b3e00c57204d68f31
+Copying blob sha256:78ac7b5c0c81c20494ba03b0ff5b582b90a27890dcc55b7571f09b3823f61931
+Copying config sha256:b7d1983d1fb6bb874fedd92c7f059a6c135283b81cddb5627fcd8da240034f94
+Writing manifest to image destination
+Storing signatures
+Successfully pushed image-registry.openshift-image-registry.svc:5000/developer-custom-s2i/greet@sha256:0982069d2a091e60f75691f5f3d73602df75f1faf87972bf0ba2d747bed37c87
+Push successful
+[student@workstation DO288-apps]$ oc get pods
+NAME                     READY   STATUS      RESTARTS   AGE
+greet-1-build            0/1     Completed   0          6m35s
+greet-2-build            0/1     Completed   0          33s
+greet-7c8cb9fc7f-44tr2   1/1     Running     0          5s
+[student@workstation DO288-apps]$ curl http://greet-developer-custom-s2i.apps.ocp4.example.com/user1
+Hello user1!. Welcome!
+[student@workstation DO288-apps]$ lab custom-s2i grade
+
+Grading the student's work for Lab: Customizing Source to Image Builds
+
+ · Log in on OpenShift.........................................  SUCCESS
+ · Enter project 'developer-custom-s2i'........................  PASS
+ · Imagestream 's2i-do288-go' exists...........................  PASS
+ · Imagestream 's2i-do288-go' points to your Quay.io account...  PASS
+ · Build config 'greet' points to correct git repo.............  PASS
+ · Latest 'greet' build is successful..........................  PASS
+ · Pod 'greet' is ready and runnning...........................  PASS
+ · Pod 'greet' logs shows application is started...............  PASS
+ · Route 'greet' exists........................................  PASS
+ · Check for 'Hola user1!. Bienvenido!' message................  FAIL
+
+Overall exercise grade.........................................  FAIL
+
+[student@workstation DO288-apps]$ git branch
+* custom-s2i
+  main
+[student@workstation DO288-apps]$ 
+
